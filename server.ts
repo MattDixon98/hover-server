@@ -1,9 +1,20 @@
 
+/* TODO: 
+    - Handle message reception from client. 
+        - Send the message to message diagnosis system.
+    - Broadcast chat room information to clients so they are aware of who they are chatting to.
+        - Send chat room information as a WebSocketCommunication of type "serverMessage". Broadcast that information everytime something on the server changes.
+    - Store chat information in database so that it can be called upon on re-renders.
+*/
+
 import WebSocket, { WebSocketServer } from "ws";
 import http from "http";
 import url from "url";
 import { v4 as uuidv4 } from "uuid";
 import { ClientProfile } from "./ClientProfileType";
+import { WebSocketCommunication } from "./WebSocketCommunicationType";
+import { ProfileValidation } from "./ProfileValidationType";
+import { SocketClosureCodes } from "./SocketClosureCodes";
 
 const MAX_CLIENTS: number = 2;
 const port: number = 9000;
@@ -17,11 +28,21 @@ server.on("connection", (socket: WebSocket, request: http.IncomingMessage) => {
     const client: any = socket;
     client.profile = getClientProfile(request.url);
     
+    // If the client's user profile is not valid, close the current connecting client's connection
+    const clientUserProfileValidation: ProfileValidation = validateUserProfile(client.profile, server);
+    if(!clientUserProfileValidation.valid){
+
+        client.send(clientUserProfileValidation.reason);
+        client.close(SocketClosureCodes.INVALID_REQUEST);
+        error = true;
+
+    }
+    
     // If number of clients exceeds max, close the current connecting client's connection
     if(server.clients.size > MAX_CLIENTS){
 
         client.send(`Connection failed: too many clients. This server permits a maximum of ${MAX_CLIENTS} clients at one time.`);
-        client.close();
+        client.close(SocketClosureCodes.INVALID_REQUEST);
         error = true;
 
     }
@@ -30,14 +51,18 @@ server.on("connection", (socket: WebSocket, request: http.IncomingMessage) => {
     if(!(client.profile.user && client.profile.role)){
 
         client.send("Connection failed: incorrect query provided. Please provide 'user' and 'role' query parameters in WebSocket request.");
-        client.close();
+        client.close(SocketClosureCodes.INVALID_REQUEST);
         error = true;
 
     } 
 
     // Handle connection errors
-    if(!error) console.log(`${client.profile.user} (id: ${client.profile.id}, role: ${client.profile.role}) has connected to the server.`); 
-    else error = false;
+    if(!error){
+        console.log(`${client.profile.user} (id: ${client.profile.id}, role: ${client.profile.role}) has connected to the server.`);
+    } else { 
+        error = false;
+        console.log(`${client.profile.user} (id: ${client.profile.id}, role: ${client.profile.role}) unsuccessfully attempted to connect to the server.`);
+    } 
 
     // Send messages
     sendWelcomeMessage(client); // Send connecting client a welcome message
@@ -46,19 +71,28 @@ server.on("connection", (socket: WebSocket, request: http.IncomingMessage) => {
     // Handle client disconnect
     client.on("close", (code: number, reason: Buffer) => {
 
-        broadcastMessage(server, `${client.profile.user} has left the chat.`, false, client); // Broadcast message to all clients
-        console.log(`${client.profile.user} (id: ${client.profile.id}, role: ${client.profile.role}) has disconnected from the server.`);
+        if(code !== SocketClosureCodes.INVALID_REQUEST){
+            broadcastMessage(server, `${client.profile.user} has left the chat.`, false, client); // Broadcast message to all clients
+            console.log(`${client.profile.user} (id: ${client.profile.id}, role: ${client.profile.role}) has disconnected from the server.`);
+        }
 
     })
 
+    // Handle message reception
     socket.on("message", msg => {
+
+        const receivedMessage: WebSocketCommunication = processChatMessage(msg.toString(), client.profile);
+        broadcastMessage(server, JSON.stringify(receivedMessage), false, client); // Broadcast message to all clients
+
     })
 
 })
 
 function sendWelcomeMessage(client: any): void {   
+
     const welcomeMessage: string = `Welcome to the chat, ${client.profile.user}! Hover is ready to go!`;
     client.send(welcomeMessage); // Send message to current connecting client
+
 }
 
 function broadcastMessage(server: WebSocketServer, message: string, excludeCurrentClient: boolean, currentClient: any): void {
@@ -99,6 +133,89 @@ function extractDataFromUrl(url: url.UrlWithStringQuery, extractToken: string) :
     }
 
     return query;
+
+}
+
+function validateUserProfile(profile: ClientProfile, server: WebSocketServer): ProfileValidation {
+
+    let valid: boolean = true;
+    let reason: string = "";
+
+    // Username validation
+    if(profile.user){
+
+        // Check username character length
+        const maxCharacters: number = 20; // TODO: Update this based on frontend requirements
+        const minCharacters: number = 8;
+        if(profile.user.length > maxCharacters){
+            valid = false;
+            reason += "\u2022 Username contains too many characters\n";
+        } else if (profile.user.length < minCharacters) {
+            valid = false;
+            reason += "\u2022 Username contains too few characters\n";
+        }
+
+        // Check username does not contain illegal characters
+        const illegalRegExp: RegExp = /[/?!@#$%^&*()+\\[\]';:,`~<>=]/g;
+        if(illegalRegExp.test(profile.user)){
+            valid = false;
+            reason += "\u2022 Username contains illegal characters\n";
+        }
+
+        // Check to see if username is already being used in the chat room
+        let dupes: number = 0;
+        server.clients.forEach((c: any)=> {
+
+            if(c.profile.user === profile.user){
+                dupes++;
+            }
+
+            if(dupes > 1){
+                valid = false;
+                reason += "\u2022 Username is already being used in this chat room\n";
+            }
+
+        })
+
+        // Check to see if username contains spaces
+        if(profile.user.split(" ").length > 1){
+            valid = false;
+            reason += "\u2022 Username cannot contain whitespaces\n"
+        }
+
+    } else {
+        valid = false;
+        reason += "\u2022 Username does not exist\n";
+    }
+
+    // User Role validation
+    if(profile.role){
+
+        // Check that role conforms to "client" or "facilitator"
+        const role: string = profile.role.toLowerCase();
+        if(!(role === "client" || role === "facilitator")){
+            valid = false;
+            reason += "\u2022 User does not have a valid role. User must be a 'client' or a 'faciliator'\n";
+        }
+
+    } else {
+        valid = false;
+        reason += "\u2022 Role does not exist\n";
+    }
+
+    return { valid: valid, reason: reason }
+
+}
+
+function processChatMessage(message: string, client: ClientProfile) : WebSocketCommunication {
+
+    const chatMessageContent: { message: string, author: ClientProfile, date: Date } = {
+        message: message,
+        author: client,
+        date: new Date()
+    }
+
+    return { type: "chatMessage", content: JSON.stringify(chatMessageContent) };
 
 }
 
