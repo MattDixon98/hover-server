@@ -1,0 +1,17 @@
+/* ChatMessageContent.tsx */
+
+.chat-message-content-highlight-depression, .chat-message-content-highlight-anxiety, .chat-message-content-highlight-risk {
+    cursor: pointer;
+}
+
+.chat-message-content-highlight-depression{
+    background-color: cyan;
+}
+
+.chat-message-content-highlight-risk{
+    background-color: lightcoral;
+}
+
+.chat-message-content-highlight-anxiety{
+    background-color: greenyellow;
+}

@@ -1,0 +1,19 @@
+/* ChatMessageProfile.tsx */
+
+.chat-message-profile-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.chat-message-profile-image {
+    border-radius: 5em;
+    height: 2.7em;
+}
+
+.chat-message-profile-name {
+    position: relative;
+    left: 0.5em;
+    bottom: 0.8em;
+    color: darkgray;
+    font-size: 1.1em;
+}
