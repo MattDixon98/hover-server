@@ -1,19 +1,18 @@
-/* ChatMessageProfile.tsx */
+/* Profile.tsx */
 
-.chat-message-profile-container {
+.profile-container {
     display: flex;
     flex-direction: row;
 }
 
-.chat-message-profile-image {
+.profile-image {
     border-radius: 5em;
     height: 2.7em;
 }
 
-.chat-message-profile-name {
+.profile-name {
     position: relative;
     left: 0.5em;
-    bottom: 0.8em;
     color: darkgray;
     font-size: 1.1em;
 }

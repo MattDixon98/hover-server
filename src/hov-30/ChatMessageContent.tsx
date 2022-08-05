@@ -69,7 +69,7 @@ function ChatMessageContent(props: ChatMessageContentProps){
 
     return(
         <>
-            {/* Parse sanitized text as HTML, permitting the use of the "class" attribute within the generated HTML tags */}
+            {/* Parse sanitized text as HTML, permitting the use of the "class" and "onmouseover" attribute within the generated HTML tags */}
             <p onMouseOver={e => {onKeywordHover(e)}} onMouseLeave={onKeywordUnhover} className="chat-message-content-text" dangerouslySetInnerHTML={{
                     __html: DOMPurify.sanitize(processKeywords(props.message, props.keywords), {ADD_ATTR: ["class", "onmouseover"]})
                 }} 

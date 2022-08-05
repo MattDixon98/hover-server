@@ -1,5 +1,5 @@
-import React from "react";
-import "./ChatMessageProfile.css";
+import React, { CSSProperties } from "react";
+import Profile from "../parents/Profile/Profile";
 
 type ChatMessageProfileProps =  {
     username: string,
@@ -8,12 +8,11 @@ type ChatMessageProfileProps =  {
 
 function ChatMessageProfile(props: ChatMessageProfileProps) {
 
+    const yPosition: CSSProperties = {top: "-0.8em"};
+
     return(
         <>
-            <div className="chat-message-profile-container">
-                <img className="chat-message-profile-image" src={props.profilePicSrc} alt="Profile" />
-                <p className="chat-message-profile-name">{props.username}</p>
-            </div>
+            <Profile name={props.username} profilePicSrc={props.profilePicSrc} yPosition={yPosition} />
         </>
     )
 

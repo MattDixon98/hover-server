@@ -1,0 +1,10 @@
+/* HoverCommentContent.tsx */
+
+.hover-comment-content-container {
+    color: grey;
+}
+
+.hover-comment-content-container a {
+    color: lightskyblue;
+    text-decoration: none;
+}
