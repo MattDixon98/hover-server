@@ -1,0 +1,22 @@
+.chat-message-content-text {
+    color: white;
+}
+
+.chat-message-chat-message-profile-container {
+    position: absolute;
+    left: 1em;
+}
+
+.chat-message-chat-message-content-container {
+    margin-top: 1.5em;
+    border: 1px solid lightgrey;
+    border-radius: 8px;
+    padding: 0.3em 0.8em 0.3em 0.8em;
+    display: inline-block;
+    background-color: mediumseagreen;
+}
+
+.chat-message-timestamp-container {
+    margin-top: -0.8em;
+    margin-left: 0.5em;
+}

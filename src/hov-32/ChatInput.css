@@ -1,6 +1,7 @@
 /* ChatInput.tsx */
 
 .chat-input-text-input {
+    width: 50%;
     font-size: 1.2em;
     border-radius: 10px;
     border-color: lightgrey;

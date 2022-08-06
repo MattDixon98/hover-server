@@ -3,11 +3,7 @@ import HoverProfile from "../hov-34/HoverProfile";
 import Timestamp from "../hov-31/Timestamp";
 import HoverCommentContent from "../hov-35/HoverCommentContent";
 import "./HoverComment.css";
-
-type HoverCommentProps = {
-    comment: string,
-    time: Date
-}
+import { HoverCommentProps } from "../types/PropTypes";
 
 function HoverComment(props: HoverCommentProps){
 

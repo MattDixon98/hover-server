@@ -7,7 +7,7 @@
 
 .profile-image {
     border-radius: 5em;
-    height: 2.7em;
+    height: 2.1em;
 }
 
 .profile-name {
@@ -15,4 +15,5 @@
     left: 0.5em;
     color: darkgray;
     font-size: 1.1em;
+    /* Element's top value is programatically set via inline styles */
 }

@@ -7,11 +7,13 @@ import ChatInput from "./hov-32/ChatInput";
 import HoverProfile from "./hov-34/HoverProfile";
 import HoverCommentContent from "./hov-35/HoverCommentContent";
 import HoverComment from "./hov-25/HoverComment";
+import ChatMessage from "./hov-23/ChatMessage";
+import ChatBar from "./hov-24/ChatBar";
+import ChatWindow from "./hov-21/ChatWindow";
 
 const keywords = [
   { word: "composer", derived: "composer", flag: "depression", position: [3, 7]},
-  { word: "entire", derived: "entire", flag: "risk", position: [6]},
-  { word: "am", derived: "am", flag: "anxiety", position: [1]}
+  { word: "entire", derived: "entire", flag: "risk", position: [6]}
 ]
 
 const hoverComment = "<p>Patient may be displaying signs of anxiety. Please use the <a href='https://google.com' target='_blank'>following service</a> to research anxiety mitigation techniques.</p>"
@@ -25,6 +27,13 @@ root.render(
     {/* <ChatInput placeholder="Enter your text here" width={50} /> */}
     {/* <HoverProfile /> */}
     {/* <HoverCommentContent comment="<p>Hello <a href='https://www.google.com' alt='A link'>World!</a></p>" /> */}
-    <HoverComment comment={hoverComment} time={new Date()} />
+    {/* <HoverComment comment={hoverComment} time={new Date()} /> */}
+    {/* <ChatMessage 
+      profile={{username: "jamierossiter", profilePicSrc: "res/profile_placeholder.jpg"}} 
+      message={{message: "I am the composer of the entire composer.", keywords: keywords}} 
+      timestamp={{time: new Date()}}
+    /> */}
+    {/* <ChatBar /> */}
+    <ChatWindow userData={{ role: "facilitator", name: "jimjams", email: "jimjams123@gmail.com" }} />
   </React.StrictMode>
 );

@@ -1,10 +1,8 @@
 import React from "react";
 import "./HoverCommentContent.css";
 import DOMPurify from "dompurify";
+import { HoverCommentContentProps } from "../types/PropTypes";
 
-type HoverCommentContentProps = {
-    comment: string // String with HTML that will is parsed by the component
-}
 
 function HoverCommentContent(props: HoverCommentContentProps){
     return(

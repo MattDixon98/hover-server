@@ -1,9 +1,6 @@
 import React from "react";
 import "./Timestamp.css";
-
-type TimestampProps = {
-    time: Date
-}
+import { TimestampProps } from "../types/PropTypes";
 
 function Timestamp(props: TimestampProps){
 

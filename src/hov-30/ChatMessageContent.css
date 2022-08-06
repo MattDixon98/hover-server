@@ -2,16 +2,18 @@
 
 .chat-message-content-highlight-depression, .chat-message-content-highlight-anxiety, .chat-message-content-highlight-risk {
     cursor: pointer;
+    padding-top: 3px;
+    padding-bottom: 3px;
 }
 
 .chat-message-content-highlight-depression{
-    background-color: cyan;
+    background-color: green
 }
 
 .chat-message-content-highlight-risk{
-    background-color: lightcoral;
+    background-color: red;
 }
 
 .chat-message-content-highlight-anxiety{
-    background-color: greenyellow;
+    background-color: blue;
 }

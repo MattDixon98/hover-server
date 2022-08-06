@@ -2,11 +2,7 @@ import React from "react";
 import DOMPurify from "dompurify";
 import { Keyword } from "../types/KeywordType";
 import "./ChatMessageContent.css";
-
-type ChatMessageContentProps = {
-    message: string,
-    keywords: Array<Keyword> // Keyword = word that has been identified as noteworthy by the Hover Message Diagnosis System
-}
+import { ChatMessageContentProps } from "../types/PropTypes";
 
 type HoveredKeywordData = {
     keyword: string | null,

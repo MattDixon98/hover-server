@@ -1,14 +1,11 @@
 import React, { CSSProperties } from "react";
 import Profile from "../parents/Profile/Profile";
+import {ChatMessageProfileProps} from "../types/PropTypes";
 
-type ChatMessageProfileProps =  {
-    username: string,
-    profilePicSrc: string
-}
 
 function ChatMessageProfile(props: ChatMessageProfileProps) {
 
-    const yPosition: CSSProperties = {top: "-0.8em"};
+    const yPosition: CSSProperties = {top: "-0.9em"};
 
     return(
         <>
