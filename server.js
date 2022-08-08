@@ -3,6 +3,7 @@
     - Handle message reception from client.
         - Send the message to message diagnosis system.
     - Broadcast chat room information to clients so they are aware of who they are chatting to.
+        - Send chat room information as a WebSocketCommunication of type "serverMessage". Broadcast that information everytime something on the server changes.
     - Store chat information in database so that it can be called upon on re-renders.
 */
 var __importDefault = (this && this.__importDefault) || function (mod) {
@@ -17,26 +18,45 @@ const MAX_CLIENTS = 2;
 const port = 9000;
 const server = new ws_1.WebSocketServer({ port: port });
 server.on("connection", (socket, request) => {
-    let error = false;
     // Create connecting client's profile (id and username)
     const client = socket;
     client.profile = getClientProfile(request.url);
+    handleConnection(socket, request, client); // Handle an incoming client connection
+    sendConnectionMessages(client); // Send messages as a result of incoming client connection
+    // Handle client disconnect
+    client.on("close", (code, reason) => {
+        let message = "";
+        if (code !== SocketClosureCodes_1.SocketClosureCodes.INVALID_REQUEST) {
+            message = `${client.profile.user} has left the chat.`;
+            broadcastMessage(server, processServerMessage(message), false, client); // Broadcast message to all clients
+            console.log(`${client.profile.user} (id: ${client.profile.id}, role: ${client.profile.role}) has disconnected from the server.`);
+        }
+    });
+    // Handle message reception
+    socket.on("message", msg => {
+        const receivedMessage = processChatMessage(msg.toString(), client.profile);
+        broadcastMessage(server, receivedMessage, false, client); // Broadcast message to all clients
+    });
+});
+function handleConnection(socket, request, client) {
+    let error = false;
+    let message = "";
     // If the client's user profile is not valid, close the current connecting client's connection
     const clientUserProfileValidation = validateUserProfile(client.profile, server);
     if (!clientUserProfileValidation.valid) {
-        client.send(clientUserProfileValidation.reason);
+        message = clientUserProfileValidation.reason;
         client.close(SocketClosureCodes_1.SocketClosureCodes.INVALID_REQUEST);
         error = true;
     }
     // If number of clients exceeds max, close the current connecting client's connection
     if (server.clients.size > MAX_CLIENTS) {
-        client.send(`Connection failed: too many clients. This server permits a maximum of ${MAX_CLIENTS} clients at one time.`);
+        message = `Connection failed: too many clients. This server permits a maximum of ${MAX_CLIENTS} clients at one time.`;
         client.close(SocketClosureCodes_1.SocketClosureCodes.INVALID_REQUEST);
         error = true;
     }
     // If a username cannot be extracted from the client's query, close the current connecting client's connection
     if (!(client.profile.user && client.profile.role)) {
-        client.send("Connection failed: incorrect query provided. Please provide 'user' and 'role' query parameters in WebSocket request.");
+        message = "Connection failed: incorrect query provided. Please provide 'user' and 'role' query parameters in WebSocket request.";
         client.close(SocketClosureCodes_1.SocketClosureCodes.INVALID_REQUEST);
         error = true;
     }
@@ -45,28 +65,19 @@ server.on("connection", (socket, request) => {
         console.log(`${client.profile.user} (id: ${client.profile.id}, role: ${client.profile.role}) has connected to the server.`);
     }
     else {
+        client.send(processServerMessage(message));
         error = false;
         console.log(`${client.profile.user} (id: ${client.profile.id}, role: ${client.profile.role}) unsuccessfully attempted to connect to the server.`);
     }
-    // Send messages
+}
+function sendConnectionMessages(client) {
+    const message = `${client.profile.user} has joined the chat.`;
     sendWelcomeMessage(client); // Send connecting client a welcome message
-    broadcastMessage(server, `${client.profile.user} has joined the chat.`, true, client); // Broadcast message to all clients except current connecting
-    // Handle client disconnect
-    client.on("close", (code, reason) => {
-        if (code !== SocketClosureCodes_1.SocketClosureCodes.INVALID_REQUEST) {
-            broadcastMessage(server, `${client.profile.user} has left the chat.`, false, client); // Broadcast message to all clients
-            console.log(`${client.profile.user} (id: ${client.profile.id}, role: ${client.profile.role}) has disconnected from the server.`);
-        }
-    });
-    // Handle message reception
-    socket.on("message", msg => {
-        const receivedMessage = processChatMessage(msg.toString(), client.profile);
-        broadcastMessage(server, JSON.stringify(receivedMessage), false, client); // Broadcast message to all clients
-    });
-});
+    broadcastMessage(server, processServerMessage(message), true, client); // Broadcast message to all clients except current connecting
+}
 function sendWelcomeMessage(client) {
     const welcomeMessage = `Welcome to the chat, ${client.profile.user}! Hover is ready to go!`;
-    client.send(welcomeMessage); // Send message to current connecting client
+    client.send(processServerMessage(welcomeMessage)); // Send message to current connecting client
 }
 function broadcastMessage(server, message, excludeCurrentClient, currentClient) {
     server.clients.forEach((c) => {
@@ -104,7 +115,7 @@ function validateUserProfile(profile, server) {
     if (profile.user) {
         // Check username character length
         const maxCharacters = 20; // TODO: Update this based on frontend requirements
-        const minCharacters = 8;
+        const minCharacters = 5;
         if (profile.user.length > maxCharacters) {
             valid = false;
             reason += "\u2022 Username contains too many characters\n";
@@ -155,12 +166,15 @@ function validateUserProfile(profile, server) {
     }
     return { valid: valid, reason: reason };
 }
+function processServerMessage(message) {
+    return JSON.stringify({ type: "serverMessage", content: message });
+}
 function processChatMessage(message, client) {
     const chatMessageContent = {
         message: message,
         author: client,
         date: new Date()
     };
-    return { type: "chatMessage", content: JSON.stringify(chatMessageContent) };
+    return JSON.stringify({ type: "chatMessage", content: JSON.stringify(chatMessageContent) });
 }
 console.log(`Hover Server v1.0 is running on port ${port}`);
