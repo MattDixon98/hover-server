@@ -5,7 +5,7 @@ import {ChatMessageProfileProps} from "../types/PropTypes";
 
 function ChatMessageProfile(props: ChatMessageProfileProps) {
 
-    const yPosition: CSSProperties = {top: "-0.9em"};
+    const yPosition: CSSProperties = {top: "-0.6em"};
 
     return(
         <>

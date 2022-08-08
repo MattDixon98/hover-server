@@ -10,7 +10,8 @@ export type ChatWindowProps = {
 export type ChatMessageProps = {
     profile: ChatMessageProfileProps,
     message: ChatMessageContentProps,
-    timestamp: TimestampProps
+    timestamp: TimestampProps,
+    chatRole: "receiver" | "sender" | "server" // Determines who sent the message for styling purposes
 }
 
 // HOV-24
@@ -33,7 +34,7 @@ export type ChatMessageProfileProps =  {
 // HOV-30
 export type ChatMessageContentProps = {
     message: string,
-    keywords: Array<Keyword> // Keyword = word that has been identified as noteworthy by the Hover Message Diagnosis System
+    keywords: Array<Keyword> // Keyword = word that has been identified as noteworthy by the Hover Message Diagnosis System,
 }
 
 // HOV-31

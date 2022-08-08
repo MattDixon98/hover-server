@@ -1,55 +1,75 @@
 import React from "react";
 import ChatMessage from "../hov-23/ChatMessage";
 import ChatBar from "../hov-24/ChatBar";
+import { Keyword } from "../types/KeywordType";
 import { Message } from "../types/MessageType";
 import { ChatWindowProps } from "../types/PropTypes";
 import { UserData } from "../types/UserDataType";
+import "./ChatWindow.css";
  
 const CHAT_SERVER_URI: string = "localhost:9000";
 
 function ChatWindow(props: ChatWindowProps){
+
+    const [chatMessages, updateChatMessages] = React.useState<Array<Message>>([]);
     
-    // Run on first render
-    React.useEffect(() => { 
-        establishChatServerConnection(props.userData);
+    // Run once on first render only
+    React.useEffect(() => {
+         
+        const websocket: WebSocket = establishChatServerConnection(props.userData);
+
+        websocket.addEventListener("message", (message: any) => {
+            handleIncomingMessage(message.data) // Handle certain messages (e.g. server or chat messages) from the WebSockets server
+        })
+
     }, [])
     
-    // TODO: Make a persistent connection to the WebSockets server to send and receive messages
-    function establishChatServerConnection(data: UserData) : void {
-        console.log(data);
-        console.log("Connection to chat server established.");
+    // Make a persistent connection to the WebSockets server to send and receive messages
+    function establishChatServerConnection(data: UserData) : WebSocket {
+        return new WebSocket(`ws://${CHAT_SERVER_URI}?user=${data.name}&role=${data.role}`); // WebSockets server expects "user" and "role" query parameters upon establishing a connection
     }
     
-    // TODO: Receive messages from the WebSockets server via the persistent connection
-    function getMessages() : Message {
-        return { message: "Test", author: "Test", date: new Date()};
+    // Format and process incoming messages, then add them to state
+    function handleIncomingMessage(incomingMessage: any): void {
+        const incomingMessageObj: any = JSON.parse(incomingMessage);
+        let formattedMessage: Message;
+        
+        switch(incomingMessageObj.type){
+            case "serverMessage":
+                formattedMessage = { message: incomingMessageObj.content, author: "Hover", date: new Date(), chatRole: "server" };
+                break;
+            case "chatMessage":
+                const chatContent: any = JSON.parse(incomingMessageObj.content);
+                const chatMessage: string = chatContent.message;
+                const chatAuthor: string = chatContent.author.user;
+                formattedMessage = { message: chatMessage, author: chatAuthor, date: new Date(), chatRole: "receiver" }
+                break;
+        }
+
+        updateChatMessages(chatMessages => [...chatMessages, formattedMessage]);
     }
 
-    // TODO: Generate <ChatMessage> components based on data received from the persistent connection
+    // Generate <ChatMessage> components based on chat messages in state
     function generateMessageComponents() : Array<JSX.Element> {
-        return [ 
-            <ChatMessage 
-                profile={{username: "jamierossiter", profilePicSrc: "res/profile_placeholder.jpg"}} 
-                message={{message: "I am the composer of the entire composer.", keywords: [
-                    { word: "composer", derived: "composer", flag: "depression", position: [3, 7]},
-                    { word: "entire", derived: "entire", flag: "risk", position: [6]}
-                ]}} 
-                timestamp={{time: new Date()}} 
-            /> 
-        ]
+        const components: Array<JSX.Element> = chatMessages.map((msg: Message) => {
+            return <ChatMessage profile={{username: msg.author, profilePicSrc: "res/profile_placeholder.jpg"}} message={{message: msg.message, keywords: new Array<Keyword>}} timestamp={{time: msg.date}} chatRole={msg.chatRole} />
+        })
+        return components;
     }
 
     function testSendMessage(message: string){
-        window.alert(`"${message}" sent.`);
+        // TODO: SEND MESSAGE TO WEBSOCKETS SERVER AND PERFORM ANALYSIS ON MESSAGE!
     }
 
     return(
         <>
-            <div className="chat-window-message-wall-container">
-                {generateMessageComponents()}
-            </div>
-            <div className="chat-window-chat-bar-container">
-                <ChatBar onMessageSend={(message: string) => { testSendMessage(message) }} />    
+            <div className="chat-window-main-container">
+                <div className="chat-window-message-wall-container">
+                    {generateMessageComponents()}
+                </div>
+                <div className="chat-window-chat-bar-container">
+                    <ChatBar onMessageSend={(message: string) => { testSendMessage(message) }} />    
+                </div>
             </div>
         </>
     )

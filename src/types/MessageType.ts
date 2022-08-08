@@ -7,5 +7,6 @@
 export type Message = {
     message: string,
     author: string,
-    date: Date
+    date: Date,
+    chatRole: "receiver" | "sender" | "server"
 }

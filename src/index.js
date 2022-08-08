@@ -20,7 +20,7 @@ const hoverComment = "<p>Patient may be displaying signs of anxiety. Please use 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
+  <>
     {/* <ChatMessageProfile username="jamierossiter" profilePicSrc="res/profile_placeholder.jpg" /> */}
     {/* <ChatMessageContent message="I am the composer of the entire composer." keywords={keywords} /> */}
     {/* <Timestamp time={new Date()} /> */}
@@ -35,5 +35,5 @@ root.render(
     /> */}
     {/* <ChatBar /> */}
     <ChatWindow userData={{ role: "facilitator", name: "jimjams", email: "jimjams123@gmail.com" }} />
-  </React.StrictMode>
+  </>
 );

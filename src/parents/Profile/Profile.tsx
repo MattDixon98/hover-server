@@ -11,9 +11,11 @@ function Profile(props: ProfileProps) {
 
     return(
         <>
-            <div className="profile-container">
-                <img className="profile-image" src={props.profilePicSrc} alt="Profile" />
-                <p className="profile-name" style={props.yPosition}>{props.name}</p>
+            <div className="profile-super-container">
+                <div className="profile-container">
+                    <img className="profile-image" src={props.profilePicSrc} alt="Profile" />
+                    <p className="profile-name" style={props.yPosition}>{props.name}</p>
+                </div>
             </div>
         </>
     )
