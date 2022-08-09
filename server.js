@@ -1,10 +1,8 @@
 "use strict";
 /* TODO:
     - Handle message reception from client.
-        - Send the message to message diagnosis system.
+        - Send the message to message diagnosis system!!!
     - Broadcast chat room information to clients so they are aware of who they are chatting to.
-        - Send chat room information as a WebSocketCommunication of type "serverMessage". Broadcast that information everytime something on the server changes.
-    - Store chat information in database so that it can be called upon on re-renders.
 */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -14,6 +12,7 @@ const ws_1 = require("ws");
 const url_1 = __importDefault(require("url"));
 const uuid_1 = require("uuid");
 const SocketClosureCodes_1 = require("./SocketClosureCodes");
+const message_diagnosis_1 = require("./hover_message_diagnosis/message_diagnosis/message-diagnosis");
 const MAX_CLIENTS = 2;
 const port = 9000;
 const server = new ws_1.WebSocketServer({ port: port });
@@ -153,9 +152,9 @@ function validateUserProfile(profile, server) {
     }
     // User Role validation
     if (profile.role) {
-        // Check that role conforms to "client" or "facilitator"
+        // Check that role conforms to "patient" or "facilitator"
         const role = profile.role.toLowerCase();
-        if (!(role === "client" || role === "facilitator")) {
+        if (!(role === "patient" || role === "facilitator")) {
             valid = false;
             reason += "\u2022 User does not have a valid role. User must be a 'client' or a 'faciliator'\n";
         }
@@ -167,14 +166,17 @@ function validateUserProfile(profile, server) {
     return { valid: valid, reason: reason };
 }
 function processServerMessage(message) {
-    return JSON.stringify({ type: "serverMessage", content: message });
+    return JSON.stringify({ type: "serverMessage", content: message }); // WebSocketCommunication Type
 }
 function processChatMessage(message, client) {
+    const diagnosis = (0, message_diagnosis_1.createMessageDiagnosis)(message);
+    console.log(diagnosis);
     const chatMessageContent = {
-        message: message,
+        message: diagnosis.analysedMessage,
+        keywords: diagnosis.keywords,
         author: client,
         date: new Date()
     };
-    return JSON.stringify({ type: "chatMessage", content: JSON.stringify(chatMessageContent) });
+    return JSON.stringify({ type: "chatMessage", content: JSON.stringify(chatMessageContent) }); // WebSocketCommunication Type
 }
 console.log(`Hover Server v1.0 is running on port ${port}`);

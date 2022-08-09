@@ -13,6 +13,9 @@ import { ClientProfile } from "./ClientProfileType";
 import { WebSocketCommunication } from "./WebSocketCommunicationType";
 import { ProfileValidation } from "./ProfileValidationType";
 import { SocketClosureCodes } from "./SocketClosureCodes";
+import { Keyword } from "./hover_message_diagnosis/types/KeywordType";
+import { createMessageDiagnosis } from "./hover_message_diagnosis/message_diagnosis/message-diagnosis";
+import { Diagnosis } from "./hover_message_diagnosis/types/DiagnosisType";
 
 const MAX_CLIENTS: number = 2;
 const port: number = 9000;
@@ -212,9 +215,9 @@ function validateUserProfile(profile: ClientProfile, server: WebSocketServer): P
     // User Role validation
     if(profile.role){
 
-        // Check that role conforms to "client" or "facilitator"
+        // Check that role conforms to "patient" or "facilitator"
         const role: string = profile.role.toLowerCase();
-        if(!(role === "client" || role === "facilitator")){
+        if(!(role === "patient" || role === "facilitator")){
             valid = false;
             reason += "\u2022 User does not have a valid role. User must be a 'client' or a 'faciliator'\n";
         }
@@ -236,8 +239,13 @@ function processServerMessage(message: string) : string {
 
 function processChatMessage(message: string, client: ClientProfile) : string {
 
-    const chatMessageContent: { message: string, author: ClientProfile, date: Date } = {
-        message: message,
+    const diagnosis: Diagnosis = createMessageDiagnosis(message);
+
+    console.log(diagnosis);
+
+    const chatMessageContent: { message: string, keywords: Array<Keyword>, author: ClientProfile, date: Date } = {
+        message: diagnosis.analysedMessage,
+        keywords: diagnosis.keywords,
         author: client,
         date: new Date()
     }
