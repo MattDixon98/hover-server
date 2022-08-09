@@ -34,6 +34,6 @@ root.render(
       timestamp={{time: new Date()}}
     /> */}
     {/* <ChatBar /> */}
-    <ChatWindow userData={{ role: "facilitator", name: "jimjams", email: "jimjams123@gmail.com" }} />
+    <ChatWindow userData={{ role: "facilitator", name: "jamierossiter", email: "jimjams123@gmail.com" }} />
   </>
 );

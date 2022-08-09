@@ -3,9 +3,13 @@
 // author: the name of the user who sent the message
 // date: the date at which the message was sent
 
+import { Keyword } from "./KeywordType"
+import { ChatMessageContentProps } from "./PropTypes"
+
 
 export type Message = {
-    message: string,
+    messageContent: string,
+    keywords: Array<Keyword> | null,
     author: string,
     date: Date,
     chatRole: "receiver" | "sender" | "server"

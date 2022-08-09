@@ -42,10 +42,6 @@
     margin-right: auto;
 }
 
-.chat-message-container.chat-role-server {
-    text-align: center;
-}
-
 .chat-message-timestamp-container {
     margin-top: -0.8em;
     margin-left: 0.5em;

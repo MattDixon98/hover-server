@@ -58,6 +58,11 @@ export type HoverCommentContentProps = {
     comment: string // String with HTML that will is parsed by the component
 }
 
+// ServerMessage
+export type ServerMessageProps = {
+    message: string;
+}
+
 
 
 

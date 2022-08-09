@@ -1,9 +1,10 @@
 import React from "react";
 import ChatMessage from "../hov-23/ChatMessage";
 import ChatBar from "../hov-24/ChatBar";
+import ServerMessage from "../ServerMessageComponent/ServerMessage";
 import { Keyword } from "../types/KeywordType";
 import { Message } from "../types/MessageType";
-import { ChatWindowProps } from "../types/PropTypes";
+import { ChatMessageContentProps, ChatWindowProps } from "../types/PropTypes";
 import { UserData } from "../types/UserDataType";
 import "./ChatWindow.css";
  
@@ -12,15 +13,20 @@ const CHAT_SERVER_URI: string = "localhost:9000";
 function ChatWindow(props: ChatWindowProps){
 
     const [chatMessages, updateChatMessages] = React.useState<Array<Message>>([]);
+    const websocket: any = React.useRef(null);
     
     // Run once on first render only
     React.useEffect(() => {
          
-        const websocket: WebSocket = establishChatServerConnection(props.userData);
+        websocket.current = establishChatServerConnection(props.userData);
 
-        websocket.addEventListener("message", (message: any) => {
+        websocket.current.addEventListener("message", (message: any) => {
             handleIncomingMessage(message.data) // Handle certain messages (e.g. server or chat messages) from the WebSockets server
         })
+
+        return () => {
+            websocket.current.close(); // Cleanup
+        }
 
     }, [])
     
@@ -36,29 +42,36 @@ function ChatWindow(props: ChatWindowProps){
         
         switch(incomingMessageObj.type){
             case "serverMessage":
-                formattedMessage = { message: incomingMessageObj.content, author: "Hover", date: new Date(), chatRole: "server" };
+                formattedMessage = { messageContent: incomingMessageObj.content, keywords: null, author: "Hover", date: new Date(), chatRole: "server" };
                 break;
             case "chatMessage":
                 const chatContent: any = JSON.parse(incomingMessageObj.content);
                 const chatMessage: string = chatContent.message;
+                const chatKeywords: Array<Keyword> = chatContent.keywords;
                 const chatAuthor: string = chatContent.author.user;
-                formattedMessage = { message: chatMessage, author: chatAuthor, date: new Date(), chatRole: "receiver" }
+                formattedMessage = { messageContent: chatMessage, keywords: chatKeywords, author: chatAuthor, date: new Date(), chatRole: determineChatRole(chatAuthor, props.userData.name) }
                 break;
         }
 
         updateChatMessages(chatMessages => [...chatMessages, formattedMessage]);
     }
 
+    function determineChatRole(author: string, clientUsername: string) : "receiver" | "sender" {
+        return author === clientUsername ? "sender" : "receiver";
+    }
+
     // Generate <ChatMessage> components based on chat messages in state
     function generateMessageComponents() : Array<JSX.Element> {
-        const components: Array<JSX.Element> = chatMessages.map((msg: Message) => {
-            return <ChatMessage profile={{username: msg.author, profilePicSrc: "res/profile_placeholder.jpg"}} message={{message: msg.message, keywords: new Array<Keyword>}} timestamp={{time: msg.date}} chatRole={msg.chatRole} />
+        const components: Array<JSX.Element> = chatMessages.map((msg: Message, index: number) => {
+            if(msg.chatRole === "server") return <ServerMessage key={`serverMsg_${index}`} message={msg.messageContent} />
+            else return <ChatMessage key={`chatMsg_${index}`} profile={{username: msg.author, profilePicSrc: "res/profile_placeholder.jpg"}} message={{message: msg.messageContent, keywords: msg.keywords ? msg.keywords : new Array<Keyword>()}} timestamp={{time: msg.date}} chatRole={msg.chatRole} />
         })
         return components;
     }
 
     function testSendMessage(message: string){
         // TODO: SEND MESSAGE TO WEBSOCKETS SERVER AND PERFORM ANALYSIS ON MESSAGE!
+        websocket.current.send(message); // Send message to WebSockets server
     }
 
     return(

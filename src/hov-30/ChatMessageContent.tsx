@@ -40,24 +40,26 @@ function ChatMessageContent(props: ChatMessageContentProps){
     function processKeywords(message: string, keywords: Array<Keyword>) : string {
         
         let formattedMessage: string = message;
-        
-        keywords.forEach((kw: Keyword) => {
+
+        if(keywords){
+            keywords.forEach((kw: Keyword) => {
             
-            // Iterate through each position of the word in case there are duplicates within the message
-            if(kw.position){
-                kw.position.forEach(pos => {
-
-                    const splitMessage: Array<string> = formattedMessage.split(" ");
-                    const targetKeyword: string = splitMessage[pos]; // Find the keyword based on its position in the array
-                    const spannedKeyword: string = `<span\nclass="chat-message-content-highlight-${kw.flag}">${targetKeyword}</span>` // Add span tags to targeted keyword, use a line break instead of a whitespace to avoid span tag being split by whitespace
-
-                    splitMessage[pos] = spannedKeyword; // Replace element in array with new keywords with <span> tags
-                    formattedMessage = splitMessage.join(" ");
-
-                })
-            }
-
-        })
+                // Iterate through each position of the word in case there are duplicates within the message
+                if(kw.position){
+                    kw.position.forEach(pos => {
+    
+                        const splitMessage: Array<string> = formattedMessage.split(" ");
+                        const targetKeyword: string = splitMessage[pos]; // Find the keyword based on its position in the array
+                        const spannedKeyword: string = `<span\nclass="chat-message-content-highlight-${kw.flag}">${targetKeyword}</span>` // Add span tags to targeted keyword, use a line break instead of a whitespace to avoid span tag being split by whitespace
+    
+                        splitMessage[pos] = spannedKeyword; // Replace element in array with new keywords with <span> tags
+                        formattedMessage = splitMessage.join(" ");
+    
+                    })
+                }
+    
+            })
+        }
 
         return formattedMessage;
 
