@@ -1,40 +1,25 @@
 import React from "react";
-import ChatMessage from "../hov-23/ChatMessage";
-import ChatBar from "../hov-24/ChatBar";
+import ChatMessage from "../hov-23_ChatMessage/ChatMessage";
+import ChatBar from "../hov-24_ChatBar/ChatBar";
 import ServerMessage from "../ServerMessageComponent/ServerMessage";
 import { Keyword } from "../types/KeywordType";
 import { Message } from "../types/MessageType";
 import { ChatMessageContentProps, ChatWindowProps } from "../types/PropTypes";
-import { UserData } from "../types/UserDataType";
 import "./ChatWindow.css";
  
-const CHAT_SERVER_URI: string = "localhost:9000";
-
 function ChatWindow(props: ChatWindowProps){
 
     const [chatMessages, updateChatMessages] = React.useState<Array<Message>>([]);
-    const websocket: any = React.useRef(null);
-    
+
     // Run once on first render only
     React.useEffect(() => {
-         
-        websocket.current = establishChatServerConnection(props.userData);
 
-        websocket.current.addEventListener("message", (message: any) => {
+        props.server.addEventListener("message", (message: any) => {
             handleIncomingMessage(message.data) // Handle certain messages (e.g. server or chat messages) from the WebSockets server
         })
 
-        return () => {
-            websocket.current.close(); // Cleanup
-        }
-
     }, [])
-    
-    // Make a persistent connection to the WebSockets server to send and receive messages
-    function establishChatServerConnection(data: UserData) : WebSocket {
-        return new WebSocket(`ws://${CHAT_SERVER_URI}?user=${data.name}&role=${data.role}`); // WebSockets server expects "user" and "role" query parameters upon establishing a connection
-    }
-    
+        
     // Format and process incoming messages, then add them to state
     function handleIncomingMessage(incomingMessage: any): void {
         const incomingMessageObj: any = JSON.parse(incomingMessage);
@@ -71,7 +56,7 @@ function ChatWindow(props: ChatWindowProps){
 
     function testSendMessage(message: string){
         // TODO: SEND MESSAGE TO WEBSOCKETS SERVER AND PERFORM ANALYSIS ON MESSAGE!
-        websocket.current.send(message); // Send message to WebSockets server
+        props.server.send(message); // Send message to WebSockets server
     }
 
     return(

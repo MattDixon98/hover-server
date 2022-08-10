@@ -1,6 +1,6 @@
 import React from "react";
-import ChatInput from "../hov-32/ChatInput";
-import PositiveButton from "../hov-33/PositiveButton";
+import ChatInput from "../hov-32_ChatInput/ChatInput";
+import PositiveButton from "../hov-33_PositiveButton/PositiveButton";
 import "./ChatBar.css";
 import { ChatBarProps } from "../types/PropTypes";
 

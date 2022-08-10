@@ -1,8 +1,8 @@
 import React from "react";
 
-import Logo from "./ui_sc_logo";
-import Profile from "./ui_sc_profile";
-import NegativeButton from "./ui_sc_negativeButton";
+import Logo from "../hov-26_TopBarLogo/ui_sc_logo";
+import Profile from "../hov-27_TopBarProfile/ui_sc_profile";
+import NegativeButton from "../hov-28_TopBarNegativeButton/ui_sc_negativeButton";
 
 type ProfileProps = {
     img: string,

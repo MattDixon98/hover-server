@@ -3,6 +3,7 @@ import { UserData } from "./UserDataType";
 
 // HOV-21 
 export type ChatWindowProps = {
+    server: WebSocket,
     userData: UserData
 }
 
@@ -63,6 +64,9 @@ export type ServerMessageProps = {
     message: string;
 }
 
-
+// ChatHoverSuper
+export type ChatHoverSuperProps = {
+    userData: UserData
+}
 
 

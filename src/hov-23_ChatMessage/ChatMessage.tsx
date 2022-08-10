@@ -1,7 +1,7 @@
 import React from "react";
-import ChatMessageProfile from "../hov-29/ChatMessageProfile";
-import ChatMessageContent from "../hov-30/ChatMessageContent";
-import Timestamp from "../hov-31/Timestamp";
+import ChatMessageProfile from "../hov-29_ChatMessageProfile/ChatMessageProfile";
+import ChatMessageContent from "../hov-30_ChatMessageContent/ChatMessageContent";
+import Timestamp from "../hov-31_Timestamp/Timestamp";
 import { ChatMessageProps } from "../types/PropTypes";
 import "./ChatMessage.css";
 

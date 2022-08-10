@@ -1,7 +1,7 @@
 import React from "react";
-import HoverProfile from "../hov-34/HoverProfile";
-import Timestamp from "../hov-31/Timestamp";
-import HoverCommentContent from "../hov-35/HoverCommentContent";
+import HoverProfile from "../hov-34_HoverProfile/HoverProfile";
+import Timestamp from "../hov-31_Timestamp/Timestamp";
+import HoverCommentContent from "../hov-35_HoverCommentContent/HoverCommentContent";
 import "./HoverComment.css";
 import { HoverCommentProps } from "../types/PropTypes";
 

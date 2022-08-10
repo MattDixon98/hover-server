@@ -1,15 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import ChatMessageProfile from "./hov-29/ChatMessageProfile";
-import ChatMessageContent from "./hov-30/ChatMessageContent";
-import Timestamp from "./hov-31/Timestamp";
-import ChatInput from "./hov-32/ChatInput";
-import HoverProfile from "./hov-34/HoverProfile";
-import HoverCommentContent from "./hov-35/HoverCommentContent";
-import HoverComment from "./hov-25/HoverComment";
-import ChatMessage from "./hov-23/ChatMessage";
-import ChatBar from "./hov-24/ChatBar";
-import ChatWindow from "./hov-21/ChatWindow";
+import ChatMessageProfile from "./hov-29_ChatMessageProfile/ChatMessageProfile";
+import ChatMessageContent from "./hov-30_ChatMessageContent/ChatMessageContent";
+import Timestamp from "./hov-31_Timestamp/Timestamp";
+import ChatInput from "./hov-32_ChatInput/ChatInput";
+import HoverProfile from "./hov-34_HoverProfile/HoverProfile";
+import HoverCommentContent from "./hov-35_HoverCommentContent/HoverCommentContent";
+import HoverComment from "./hov-25_HoverComment/HoverComment";
+import ChatMessage from "./hov-23_ChatMessage/ChatMessage";
+import ChatBar from "./hov-24_ChatBar/ChatBar";
+import ChatWindow from "./hov-21_ChatWindow/ChatWindow";
+import ChatHoverSuperwindow from "./ChatHoverSuperwindow/ChatHoverSuperwindow";
 
 const keywords = [
   { word: "composer", derived: "composer", flag: "depression", position: [3, 7]},
@@ -34,6 +35,7 @@ root.render(
       timestamp={{time: new Date()}}
     /> */}
     {/* <ChatBar /> */}
-    <ChatWindow userData={{ role: "facilitator", name: "jamierossiter", email: "jimjams123@gmail.com" }} />
+    {/* <ChatWindow userData={{ role: "facilitator", name: "jamierossiter", email: "jimjams123@gmail.com" }} /> */}
+    <ChatHoverSuperwindow userData={{ role: "facilitator", name: "jamierossiter", email: "jimjams123@gmail.com" }} />
   </>
 );
