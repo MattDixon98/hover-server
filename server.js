@@ -1,7 +1,6 @@
 "use strict";
 /* TODO:
-    - Handle message reception from client.
-        - Send the message to message diagnosis system!!!
+    - ASSIGN ALL MESSAGES SENT BY A CLIENT TO THE CLIENT OBJECT FOR TYPING SPEED/MESSAGE SPEED ANALYSIS
     - Broadcast chat room information to clients so they are aware of who they are chatting to.
 */
 var __importDefault = (this && this.__importDefault) || function (mod) {
@@ -13,9 +12,11 @@ const url_1 = __importDefault(require("url"));
 const uuid_1 = require("uuid");
 const SocketClosureCodes_1 = require("./SocketClosureCodes");
 const message_diagnosis_1 = require("./hover_message_diagnosis/message_diagnosis/message-diagnosis");
+const transcript_generator_1 = require("./hover_transcript_generator/transcript_generator");
 const MAX_CLIENTS = 2;
 const port = 9000;
 const server = new ws_1.WebSocketServer({ port: port });
+let messageHistory = []; // Save message history
 server.on("connection", (socket, request) => {
     // Create connecting client's profile (id and username)
     const client = socket;
@@ -25,6 +26,9 @@ server.on("connection", (socket, request) => {
     // Handle client disconnect
     client.on("close", (code, reason) => {
         let message = "";
+        if (messageHistory.length > 0)
+            generateChatTranscript(messageHistory);
+        messageHistory = []; // Clear message history between clients
         if (code !== SocketClosureCodes_1.SocketClosureCodes.INVALID_REQUEST) {
             message = `${client.profile.user} has left the chat.`;
             broadcastMessage(server, processServerMessage(message), false, client); // Broadcast message to all clients
@@ -34,7 +38,9 @@ server.on("connection", (socket, request) => {
     // Handle message reception
     socket.on("message", msg => {
         const receivedMessage = processChatMessage(msg.toString(), client.profile);
+        messageHistory.push(receivedMessage); // Add to message history
         broadcastMessage(server, receivedMessage, false, client); // Broadcast message to all clients
+        console.log(messageHistory);
     });
 });
 function handleConnection(socket, request, client) {
@@ -178,5 +184,21 @@ function processChatMessage(message, client) {
         date: new Date()
     };
     return JSON.stringify({ type: "chatMessage", content: JSON.stringify(chatMessageContent) }); // WebSocketCommunication Type
+}
+function generateChatTranscript(history) {
+    const transcriptMessageObjects = history.map(websocketcomm => {
+        const parsedComm = JSON.parse(websocketcomm);
+        const parsedContent = JSON.parse(parsedComm.content);
+        const parsedAuthor = { user: "Hover", role: "server" };
+        // Check that author properties exist on parsedContent
+        if (parsedContent.author.user) {
+            parsedAuthor.user = parsedContent.author.user;
+        }
+        if (parsedContent.author.role) {
+            parsedAuthor.role = parsedContent.author.role;
+        }
+        return { messageContent: parsedContent.message, author: parsedAuthor.user, dateSent: parsedContent.date.toLocaleString(), role: parsedAuthor.role };
+    });
+    (0, transcript_generator_1.generateTranscript)(transcriptMessageObjects);
 }
 console.log(`Hover Server v1.0 is running on port ${port}`);

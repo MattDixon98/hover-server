@@ -1,7 +1,6 @@
 
 /* TODO: 
-    - Handle message reception from client. 
-        - Send the message to message diagnosis system!!!
+    - ASSIGN ALL MESSAGES SENT BY A CLIENT TO THE CLIENT OBJECT FOR TYPING SPEED/MESSAGE SPEED ANALYSIS
     - Broadcast chat room information to clients so they are aware of who they are chatting to.
 */
 
@@ -16,10 +15,14 @@ import { SocketClosureCodes } from "./SocketClosureCodes";
 import { Keyword } from "./hover_message_diagnosis/types/KeywordType";
 import { createMessageDiagnosis } from "./hover_message_diagnosis/message_diagnosis/message-diagnosis";
 import { Diagnosis } from "./hover_message_diagnosis/types/DiagnosisType";
+import { ChatMessageContent } from "./ChatMessageContentType";
+import { generateTranscript } from "./hover_transcript_generator/transcript_generator";
+import { TranscriptMessage } from "./TranscriptMessageType";
 
 const MAX_CLIENTS: number = 2;
 const port: number = 9000;
 const server: WebSocketServer = new WebSocketServer({ port: port });
+let messageHistory: Array<string> = []; // Save message history
 
 server.on("connection", (socket: WebSocket, request: http.IncomingMessage) => {
 
@@ -34,6 +37,10 @@ server.on("connection", (socket: WebSocket, request: http.IncomingMessage) => {
     client.on("close", (code: number, reason: Buffer) => {
 
         let message: string = "";
+
+        // TODO: SAVE CHAT TRANSCRIPT TO FILE SERVER, THEN SAVE THE LINK TO THAT FILE IN DATABASE!
+        if(messageHistory.length > 0) generateChatTranscript(messageHistory); // Generate chat transcript if there are messages in message history
+        messageHistory = []; // Clear message history between clients
         
         if(code !== SocketClosureCodes.INVALID_REQUEST){
 
@@ -50,8 +57,10 @@ server.on("connection", (socket: WebSocket, request: http.IncomingMessage) => {
     socket.on("message", msg => {
 
         const receivedMessage: string = processChatMessage(msg.toString(), client.profile);
+        messageHistory.push(receivedMessage); // Add to message history
         broadcastMessage(server, receivedMessage, false, client); // Broadcast message to all clients
 
+        console.log(messageHistory);
     })
 
 })
@@ -243,7 +252,7 @@ function processChatMessage(message: string, client: ClientProfile) : string {
 
     console.log(diagnosis);
 
-    const chatMessageContent: { message: string, keywords: Array<Keyword>, author: ClientProfile, date: Date } = {
+    const chatMessageContent: ChatMessageContent = {
         message: diagnosis.analysedMessage,
         keywords: diagnosis.keywords,
         author: client,
@@ -251,6 +260,30 @@ function processChatMessage(message: string, client: ClientProfile) : string {
     }
 
     return JSON.stringify({ type: "chatMessage", content: JSON.stringify(chatMessageContent) }); // WebSocketCommunication Type
+}
+
+function generateChatTranscript(history: Array<string>){
+
+    const transcriptMessageObjects: Array<TranscriptMessage> = history.map(websocketcomm => {
+
+        const parsedComm: WebSocketCommunication = JSON.parse(websocketcomm);
+        const parsedContent: ChatMessageContent = JSON.parse(parsedComm.content);
+        const parsedAuthor: { user: string, role: string } = { user: "Hover", role: "server" }
+
+        // Check that author properties exist on parsedContent
+        if(parsedContent.author.user){
+            parsedAuthor.user = parsedContent.author.user;
+        }
+        if(parsedContent.author.role){
+            parsedAuthor.role = parsedContent.author.role;
+        }
+
+        return { messageContent: parsedContent.message, author: parsedAuthor.user, dateSent: parsedContent.date.toLocaleString(), role: parsedAuthor.role }
+
+    })
+
+    generateTranscript(transcriptMessageObjects);
+
 }
 
 console.log(`Hover Server v1.0 is running on port ${port}`);
