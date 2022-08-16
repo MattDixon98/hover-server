@@ -5,5 +5,6 @@ export type ChatMessageContent = {
     message: string, 
     keywords: Array<Keyword>, 
     author: ClientProfile, 
-    date: Date 
+    date: Date,
+    hover: string
 }

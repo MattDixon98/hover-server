@@ -18,6 +18,8 @@ import { Diagnosis } from "./hover_message_diagnosis/types/DiagnosisType";
 import { ChatMessageContent } from "./ChatMessageContentType";
 import { generateTranscript } from "./hover_transcript_generator/transcript_generator";
 import { TranscriptMessage } from "./TranscriptMessageType";
+import { detectTypingSpeed } from "./hover_detect_typing_speed/DetectTypingSpeed";
+import { TypingSpeedMessage } from "./TypingSpeedMessageType";
 
 const MAX_CLIENTS: number = 2;
 const port: number = 9000;
@@ -60,7 +62,6 @@ server.on("connection", (socket: WebSocket, request: http.IncomingMessage) => {
         messageHistory.push(receivedMessage); // Add to message history
         broadcastMessage(server, receivedMessage, false, client); // Broadcast message to all clients
 
-        console.log(messageHistory);
     })
 
 })
@@ -250,13 +251,16 @@ function processChatMessage(message: string, client: ClientProfile) : string {
 
     const diagnosis: Diagnosis = createMessageDiagnosis(message);
 
-    console.log(diagnosis);
-
     const chatMessageContent: ChatMessageContent = {
         message: diagnosis.analysedMessage,
         keywords: diagnosis.keywords,
         author: client,
-        date: new Date()
+        date: new Date(),
+        hover: "Add Hover message here"
+    }
+
+    if(messageHistory.length > 0){
+        calculateTypingSpeed(chatMessageContent); // Use this to generate a Hover message.
     }
 
     return JSON.stringify({ type: "chatMessage", content: JSON.stringify(chatMessageContent) }); // WebSocketCommunication Type
@@ -284,6 +288,30 @@ function generateChatTranscript(history: Array<string>){
 
     generateTranscript(transcriptMessageObjects);
 
+}
+
+function calculateTypingSpeed(currentMessage: ChatMessageContent): number {
+    const prevMsg: ChatMessageContent = JSON.parse(JSON.parse(messageHistory[messageHistory.length - 1]).content);
+
+    const prevTypingSpeedMsg: TypingSpeedMessage = { content: prevMsg.message, timestamp: prevMsg.date };
+    const currTypingSpeedMsg: TypingSpeedMessage = { content: currentMessage.message, timestamp: currentMessage.date }
+
+    const messageSpeedDetection: number = detectTypingSpeed(prevTypingSpeedMsg, currTypingSpeedMsg);
+
+    return messageSpeedDetection;
+
+    /*
+        DetectTypingSpeed returns and int; lets call it "result"
+
+        result is then compared to the current Diagnosis.typingSpeed
+
+        if result is greater than (Diagnosis.typingSpeed + 3)
+            then let hover comment know that the given message exhibits anxiety
+        else
+            dont hover comment
+
+        update Diagnosis.typingSpeed to (Diagnosis.typingSpeed + result)/2  
+    */
 }
 
 console.log(`Hover Server v1.0 is running on port ${port}`);

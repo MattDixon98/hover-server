@@ -1,0 +1,4 @@
+anxious: 3
+scare: 2
+worry: 1
+

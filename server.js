@@ -13,6 +13,7 @@ const uuid_1 = require("uuid");
 const SocketClosureCodes_1 = require("./SocketClosureCodes");
 const message_diagnosis_1 = require("./hover_message_diagnosis/message_diagnosis/message-diagnosis");
 const transcript_generator_1 = require("./hover_transcript_generator/transcript_generator");
+const DetectTypingSpeed_1 = require("./hover_detect_typing_speed/DetectTypingSpeed");
 const MAX_CLIENTS = 2;
 const port = 9000;
 const server = new ws_1.WebSocketServer({ port: port });
@@ -26,8 +27,9 @@ server.on("connection", (socket, request) => {
     // Handle client disconnect
     client.on("close", (code, reason) => {
         let message = "";
+        // TODO: SAVE CHAT TRANSCRIPT TO FILE SERVER, THEN SAVE THE LINK TO THAT FILE IN DATABASE!
         if (messageHistory.length > 0)
-            generateChatTranscript(messageHistory);
+            generateChatTranscript(messageHistory); // Generate chat transcript if there are messages in message history
         messageHistory = []; // Clear message history between clients
         if (code !== SocketClosureCodes_1.SocketClosureCodes.INVALID_REQUEST) {
             message = `${client.profile.user} has left the chat.`;
@@ -40,7 +42,6 @@ server.on("connection", (socket, request) => {
         const receivedMessage = processChatMessage(msg.toString(), client.profile);
         messageHistory.push(receivedMessage); // Add to message history
         broadcastMessage(server, receivedMessage, false, client); // Broadcast message to all clients
-        console.log(messageHistory);
     });
 });
 function handleConnection(socket, request, client) {
@@ -176,13 +177,22 @@ function processServerMessage(message) {
 }
 function processChatMessage(message, client) {
     const diagnosis = (0, message_diagnosis_1.createMessageDiagnosis)(message);
-    console.log(diagnosis);
     const chatMessageContent = {
         message: diagnosis.analysedMessage,
         keywords: diagnosis.keywords,
         author: client,
-        date: new Date()
+        date: new Date(),
+        hover: "Add Hover message here"
     };
+    if (messageHistory.length > 0) {
+        const prevMsg = JSON.parse(JSON.parse(messageHistory[messageHistory.length - 1]).content);
+        const prevTypingSpeedMsg = { content: prevMsg.message, timestamp: prevMsg.date };
+        const currTypingSpeedMsg = { content: chatMessageContent.message, timestamp: chatMessageContent.date };
+        // console.log("Prev Typing Msg Date", prevTypingSpeedMsg.timestamp);
+        // console.log("Curr Typing Msg Date", currTypingSpeedMsg.timestamp);
+        const messageSpeedDetection = (0, DetectTypingSpeed_1.detectTypingSpeed)(prevTypingSpeedMsg, currTypingSpeedMsg);
+        console.log(messageSpeedDetection);
+    }
     return JSON.stringify({ type: "chatMessage", content: JSON.stringify(chatMessageContent) }); // WebSocketCommunication Type
 }
 function generateChatTranscript(history) {
