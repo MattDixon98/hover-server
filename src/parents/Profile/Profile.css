@@ -1,0 +1,19 @@
+/* Profile.tsx */
+
+.profile-container {
+    margin-right: 1em;
+}
+ 
+.profile-image {
+    border-radius: 5em;
+    height: 2.1em;
+}
+
+.profile-name {
+    display: inline-block;
+    position: relative;
+    color: darkgray;
+    font-size: 1.1em;
+    left: 0.5em;
+    /* Element's top value is programatically set via inline styles */
+}

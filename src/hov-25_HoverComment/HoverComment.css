@@ -1,0 +1,20 @@
+/* HoverComment.tsx */
+
+.hover-comment-container {
+    width: 30em;
+}
+
+.hover-comment-metadata {
+    display: flex;
+    flex-direction: row;
+}
+
+.hover-comment-timestamp {
+    margin-left: auto;
+}
+
+.hover-comment-content {
+    margin: auto;
+    text-align: center;
+    width: 80%;
+}
