@@ -7,6 +7,11 @@ export type ChatWindowProps = {
     userData: UserData
 }
 
+// HOV-22
+export type HoverWindowProps = {
+    server: WebSocket
+}
+
 // HOV-23
 export type ChatMessageProps = {
     profile: ChatMessageProfileProps,
