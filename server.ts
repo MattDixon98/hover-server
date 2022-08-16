@@ -12,15 +12,15 @@ import { ClientProfile } from "./ClientProfileType";
 import { WebSocketCommunication } from "./WebSocketCommunicationType";
 import { ProfileValidation } from "./ProfileValidationType";
 import { SocketClosureCodes } from "./SocketClosureCodes";
-import { Keyword } from "./hover_message_diagnosis/types/KeywordType";
+import { Keyword } from "./KeywordType";
 import { createMessageDiagnosis } from "./hover_message_diagnosis/message_diagnosis/message-diagnosis";
-import { Diagnosis } from "./hover_message_diagnosis/types/DiagnosisType";
+import { Diagnosis } from "./DiagnosisType";
 import { ChatMessageContent } from "./ChatMessageContentType";
 import { generateTranscript } from "./hover_transcript_generator/transcript_generator";
 import { TranscriptMessage } from "./TranscriptMessageType";
 import { detectTypingSpeed } from "./hover_detect_typing_speed/DetectTypingSpeed";
 import { TypingSpeedMessage } from "./TypingSpeedMessageType";
-import { AnalysisData } from "./AnalysisDataType";
+import { generateHoverMessage } from "./hover_generate_hover_message/GenerateHoverMessage";
 
 const MAX_CLIENTS: number = 2;
 const port: number = 9000;
@@ -250,19 +250,27 @@ function processServerMessage(message: string) : string {
 
 function processChatMessage(message: string, client: ClientProfile) : string {
 
+    const currentDate: Date = new Date();
+
     const diagnosis: Diagnosis = createMessageDiagnosis(message);
+
+    // If there is more than one message, calculate characters per second between most recently sent message and current message
+    let typingSpeed: number = 0;
+    if(messageHistory.length > 0){
+        typingSpeed = calculateTypingSpeed({message: message, date: currentDate}); // Use this to generate a Hover message.
+    }
 
     const chatMessageContent: ChatMessageContent = {
         message: diagnosis.analysedMessage,
         keywords: diagnosis.keywords,
         author: client,
         date: new Date(),
-        hover: "Add Hover message here"
-    }
-
-    // If there is more than one message, calculate characters per second between most recently sent message and current message
-    if(messageHistory.length > 0){
-        calculateTypingSpeed(chatMessageContent); // Use this to generate a Hover message.
+        hover: generateHoverMessage({
+            score: diagnosis.score,
+            repetition: diagnosis.repetition,
+            correctness: diagnosis.correctness,
+            typingSpeed: typingSpeed
+        })
     }
 
     return JSON.stringify({ type: "chatMessage", content: JSON.stringify(chatMessageContent) }); // WebSocketCommunication Type
@@ -292,11 +300,11 @@ function generateChatTranscript(history: Array<string>){
 
 }
 
-function calculateTypingSpeed(currentMessage: ChatMessageContent): number {
+function calculateTypingSpeed(current: {message: string, date: Date}): number {
     const prevMsg: ChatMessageContent = JSON.parse(JSON.parse(messageHistory[messageHistory.length - 1]).content);
 
     const prevTypingSpeedMsg: TypingSpeedMessage = { content: prevMsg.message, timestamp: prevMsg.date };
-    const currTypingSpeedMsg: TypingSpeedMessage = { content: currentMessage.message, timestamp: currentMessage.date }
+    const currTypingSpeedMsg: TypingSpeedMessage = { content: current.message, timestamp: current.date }
 
     const messageSpeedDetection: number = detectTypingSpeed(prevTypingSpeedMsg, currTypingSpeedMsg);
 
@@ -314,25 +322,6 @@ function calculateTypingSpeed(currentMessage: ChatMessageContent): number {
 
         update Diagnosis.typingSpeed to (Diagnosis.typingSpeed + result)/2  
     */
-}
-
-/* GENERATE HOVER MESSAGE - separate into its own module */
-
-function generateHoverMessage(analysisData: AnalysisData): string {
-    let message: string = "";
-    // If there is any repetition in the message
-    if(analysisData.repetition.length > 0){
-        message += createRepetitionComment(analysisData.repetition);
-    }
-    return message;
-}
-
-function createRepetitionComment(repetition: Array<{ word: string, recurrence: number }>) : string {
-    let comment: string = "";
-    repetition.forEach((rep: {word: string, recurrence: number}) => {
-        comment += `${rep.word} was repeated ${rep.recurrence} times.\n`;
-    })
-    return comment;
 }
 
 console.log(`Hover Server v1.0 is running on port ${port}`);

@@ -1,5 +1,9 @@
+import { Repetition } from "./RepetitionInterface";
+import { Score } from "./ScoreType";
+
 export type AnalysisData = {
-    score: number,
-    repetition: Array<{ word: string, recurrence: number }>,
-    correctness: number
+    score: Score,
+    repetition: Repetition,
+    correctness: number,
+    typingSpeed: number
 }

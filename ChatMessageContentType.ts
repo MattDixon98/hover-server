@@ -1,5 +1,5 @@
 import { ClientProfile } from "./ClientProfileType";
-import { Keyword } from "./hover_message_diagnosis/types/KeywordType";
+import { Keyword } from "./KeywordType";
 
 export type ChatMessageContent = { 
     message: string, 

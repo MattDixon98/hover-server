@@ -14,6 +14,7 @@ const SocketClosureCodes_1 = require("./SocketClosureCodes");
 const message_diagnosis_1 = require("./hover_message_diagnosis/message_diagnosis/message-diagnosis");
 const transcript_generator_1 = require("./hover_transcript_generator/transcript_generator");
 const DetectTypingSpeed_1 = require("./hover_detect_typing_speed/DetectTypingSpeed");
+const GenerateHoverMessage_1 = require("./hover_generate_hover_message/GenerateHoverMessage");
 const MAX_CLIENTS = 2;
 const port = 9000;
 const server = new ws_1.WebSocketServer({ port: port });
@@ -176,23 +177,25 @@ function processServerMessage(message) {
     return JSON.stringify({ type: "serverMessage", content: message }); // WebSocketCommunication Type
 }
 function processChatMessage(message, client) {
+    const currentDate = new Date();
     const diagnosis = (0, message_diagnosis_1.createMessageDiagnosis)(message);
+    // If there is more than one message, calculate characters per second between most recently sent message and current message
+    let typingSpeed = 0;
+    if (messageHistory.length > 0) {
+        typingSpeed = calculateTypingSpeed({ message: message, date: currentDate }); // Use this to generate a Hover message.
+    }
     const chatMessageContent = {
         message: diagnosis.analysedMessage,
         keywords: diagnosis.keywords,
         author: client,
         date: new Date(),
-        hover: "Add Hover message here"
+        hover: (0, GenerateHoverMessage_1.generateHoverMessage)({
+            score: diagnosis.score,
+            repetition: diagnosis.repetition,
+            correctness: diagnosis.correctness,
+            typingSpeed: typingSpeed
+        })
     };
-    if (messageHistory.length > 0) {
-        const prevMsg = JSON.parse(JSON.parse(messageHistory[messageHistory.length - 1]).content);
-        const prevTypingSpeedMsg = { content: prevMsg.message, timestamp: prevMsg.date };
-        const currTypingSpeedMsg = { content: chatMessageContent.message, timestamp: chatMessageContent.date };
-        // console.log("Prev Typing Msg Date", prevTypingSpeedMsg.timestamp);
-        // console.log("Curr Typing Msg Date", currTypingSpeedMsg.timestamp);
-        const messageSpeedDetection = (0, DetectTypingSpeed_1.detectTypingSpeed)(prevTypingSpeedMsg, currTypingSpeedMsg);
-        console.log(messageSpeedDetection);
-    }
     return JSON.stringify({ type: "chatMessage", content: JSON.stringify(chatMessageContent) }); // WebSocketCommunication Type
 }
 function generateChatTranscript(history) {
@@ -210,5 +213,24 @@ function generateChatTranscript(history) {
         return { messageContent: parsedContent.message, author: parsedAuthor.user, dateSent: parsedContent.date.toLocaleString(), role: parsedAuthor.role };
     });
     (0, transcript_generator_1.generateTranscript)(transcriptMessageObjects);
+}
+function calculateTypingSpeed(current) {
+    const prevMsg = JSON.parse(JSON.parse(messageHistory[messageHistory.length - 1]).content);
+    const prevTypingSpeedMsg = { content: prevMsg.message, timestamp: prevMsg.date };
+    const currTypingSpeedMsg = { content: current.message, timestamp: current.date };
+    const messageSpeedDetection = (0, DetectTypingSpeed_1.detectTypingSpeed)(prevTypingSpeedMsg, currTypingSpeedMsg);
+    return messageSpeedDetection;
+    /*
+        DetectTypingSpeed returns and int; lets call it "result"
+
+        result is then compared to the current Diagnosis.typingSpeed
+
+        if result is greater than (Diagnosis.typingSpeed + 3)
+            then let hover comment know that the given message exhibits anxiety
+        else
+            dont hover comment
+
+        update Diagnosis.typingSpeed to (Diagnosis.typingSpeed + result)/2
+    */
 }
 console.log(`Hover Server v1.0 is running on port ${port}`);

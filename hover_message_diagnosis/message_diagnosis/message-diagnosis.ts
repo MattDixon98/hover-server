@@ -1,14 +1,13 @@
 /* TODO: 
 */
 
-import { Diagnosis } from "../types/DiagnosisType";
-import { Keyword } from "../types/KeywordType";
-import { TagInitial } from "../types/TagInitialType";
-import { WordLists } from "../types/WordListsType";
-import { Repetition } from "../types/RepetitionInterface";
-
+import { Diagnosis } from "../../DiagnosisType";
+import { Keyword } from "../../KeywordType";
+import { TagInitial } from "../../TagInitialType";
+import { WordLists } from "../..//WordListsType";
+import { Repetition } from "../../RepetitionInterface";
 import * as fs from "fs";
-import { Score } from "../types/ScoreType";
+import { Score } from "../../ScoreType";
 const pos = require("pos");
 const lemmatize = require("wink-lemmatizer");
 const synonyms = require("synonyms");
