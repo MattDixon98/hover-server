@@ -20,6 +20,7 @@ import { generateTranscript } from "./hover_transcript_generator/transcript_gene
 import { TranscriptMessage } from "./TranscriptMessageType";
 import { detectTypingSpeed } from "./hover_detect_typing_speed/DetectTypingSpeed";
 import { TypingSpeedMessage } from "./TypingSpeedMessageType";
+import { AnalysisData } from "./AnalysisDataType";
 
 const MAX_CLIENTS: number = 2;
 const port: number = 9000;
@@ -259,6 +260,7 @@ function processChatMessage(message: string, client: ClientProfile) : string {
         hover: "Add Hover message here"
     }
 
+    // If there is more than one message, calculate characters per second between most recently sent message and current message
     if(messageHistory.length > 0){
         calculateTypingSpeed(chatMessageContent); // Use this to generate a Hover message.
     }
@@ -312,6 +314,25 @@ function calculateTypingSpeed(currentMessage: ChatMessageContent): number {
 
         update Diagnosis.typingSpeed to (Diagnosis.typingSpeed + result)/2  
     */
+}
+
+/* GENERATE HOVER MESSAGE - separate into its own module */
+
+function generateHoverMessage(analysisData: AnalysisData): string {
+    let message: string = "";
+    // If there is any repetition in the message
+    if(analysisData.repetition.length > 0){
+        message += createRepetitionComment(analysisData.repetition);
+    }
+    return message;
+}
+
+function createRepetitionComment(repetition: Array<{ word: string, recurrence: number }>) : string {
+    let comment: string = "";
+    repetition.forEach((rep: {word: string, recurrence: number}) => {
+        comment += `${rep.word} was repeated ${rep.recurrence} times.\n`;
+    })
+    return comment;
 }
 
 console.log(`Hover Server v1.0 is running on port ${port}`);
