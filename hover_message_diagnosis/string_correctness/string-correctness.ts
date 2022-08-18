@@ -1,25 +1,29 @@
-const Spelling = require("spelling");
-const dictionary = require("./dictionary");
+const Dictionary = require("./dictionary");
 
-let dict = new Spelling(dictionary);
-
-export function stringCorrectness(message: any){
-
+export function stringCorrectness(message: string){
     // Initialise place holder for errors
     let err_counter = 0;
-    // Split message into an array by spaces
-    let message_ary = message.split(" ");
+    // Split message into an array by spaces and hyphens
+    let message_ary = message.split(/[ -]+/);
     // Get the length of the array (how many words)
-    let message_lng = message.length;
+    let message_lng = message_ary.length;
 
+    // Remove any special characters (such as commas and exclamation marks) from each string in the array
     for(let i = 0; i < message_lng ; i++){
-        if(message_ary[i]){
-            if(!dict.lookup(message_ary[i]).found){
-                err_counter++;
-            }
+        message_ary[i] = message_ary[i].replace(/[^\w\s]/gi, '');
+    }
+
+    // Cycle through the array to find any errors
+    for(let i = 0; i < message_lng ; i++){
+        if(!Dictionary.includes(message_ary[i])){
+            // If a word is not found, add to the error counter
+            err_counter++;
         }
     }
 
-    let result = Math.round((((message_lng - err_counter)/message_lng)*100) * 100) / 100;
+    // Get the percentage of the message correctness
+    let result = ((message_lng-err_counter)/message_lng)*100;
     return result;
 }
+
+// console.log(stringCorrectness("hello-world and this, more words"));
