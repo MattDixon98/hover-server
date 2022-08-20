@@ -254,10 +254,15 @@ function analyseRepetition(tokenizedMessage) {
     return repetition;
 }
 function calculateMessageScore(tokens) {
-    const finalScore = { anxiety: 0, depression: 0, risk: 0 };
+    const finalScore = { anxiety: 0, depression: 0, risk: false };
     tokens.forEach((tok) => {
-        if (tok.flag && (tok.flag === "anxiety" || tok.flag === "depression" || tok.flag === "risk")) {
-            finalScore[tok.flag] += tok.score;
+        if (tok.flag) {
+            if ((tok.flag === "anxiety" || tok.flag === "depression")) {
+                finalScore[tok.flag] += tok.score;
+            }
+            if (tok.flag === "risk") {
+                finalScore["risk"] = true;
+            }
         }
     });
     return finalScore;

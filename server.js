@@ -220,17 +220,5 @@ function calculateTypingSpeed(current) {
     const currTypingSpeedMsg = { content: current.message, timestamp: current.date };
     const messageSpeedDetection = (0, DetectTypingSpeed_1.detectTypingSpeed)(prevTypingSpeedMsg, currTypingSpeedMsg);
     return messageSpeedDetection;
-    /*
-        DetectTypingSpeed returns and int; lets call it "result"
-
-        result is then compared to the current Diagnosis.typingSpeed
-
-        if result is greater than (Diagnosis.typingSpeed + 3)
-            then let hover comment know that the given message exhibits anxiety
-        else
-            dont hover comment
-
-        update Diagnosis.typingSpeed to (Diagnosis.typingSpeed + result)/2
-    */
 }
 console.log(`Hover Server v1.0 is running on port ${port}`);

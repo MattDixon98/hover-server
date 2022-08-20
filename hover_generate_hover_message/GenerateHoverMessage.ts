@@ -39,7 +39,7 @@ function createScoreComment(score: Score): string {
     if(score.depression > 1){
         comment += "Patient is displaying signs of depression.\n"
     }
-    if(score.risk > 1){
+    if(score.risk){
         comment += "Patient may be a risk to themselves or others.\n"
     }
     return comment;
