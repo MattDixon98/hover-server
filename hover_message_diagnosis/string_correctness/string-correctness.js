@@ -11,7 +11,7 @@ function stringCorrectness(message) {
     let message_lng = message_ary.length;
     // Remove any special characters (such as commas and exclamation marks) from each string in the array
     for (let i = 0; i < message_lng; i++) {
-        message_ary[i] = message_ary[i].replace(/[^\w\s]/gi, '');
+        message_ary[i] = message_ary[i].toLowerCase().replace(/[^\w\s]/gi, '');
     }
     // Cycle through the array to find any errors
     for (let i = 0; i < message_lng; i++) {
