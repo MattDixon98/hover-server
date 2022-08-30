@@ -25,6 +25,7 @@ import { generateHoverMessage } from "./hover_generate_hover_message/GenerateHov
 const MAX_CLIENTS: number = 2;
 const port: number = 9000;
 const server: WebSocketServer = new WebSocketServer({ port: port });
+let users: Array<ClientProfile> = [];
 let messageHistory: Array<string> = []; // Save message history
 
 server.on("connection", (socket: WebSocket, request: http.IncomingMessage) => {
@@ -49,6 +50,9 @@ server.on("connection", (socket: WebSocket, request: http.IncomingMessage) => {
 
             message = `${client.profile.user} has left the chat.`;
             broadcastMessage(server, processServerMessage(message), false, client); // Broadcast message to all clients
+            users = users.filter((removedUser: ClientProfile) => { // Remove the user from the global user list
+                return removedUser.id !== client.profile.id
+            })
 
             console.log(`${client.profile.user} (id: ${client.profile.id}, role: ${client.profile.role}) has disconnected from the server.`);
 
@@ -104,6 +108,7 @@ function handleConnection(socket: WebSocket, request: http.IncomingMessage, clie
     if(!error){
 
         console.log(`${client.profile.user} (id: ${client.profile.id}, role: ${client.profile.role}) has connected to the server.`);
+        users.push(client.profile); // Add client to the global users list 
 
     } else { 
 
@@ -119,8 +124,9 @@ function sendConnectionMessages(client: any): void {
 
     const message: string = `${client.profile.user} has joined the chat.`;
     sendWelcomeMessage(client); // Send connecting client a welcome message
-    broadcastMessage(server, processServerMessage(message), true, client); // Broadcast message to all clients except current connecting
-
+    broadcastMessage(server, processServerMessage(message), true, client); // Broadcast server message to clients indicating the newly-joined client has joined
+    broadcastMessage(server, processUserDetailsMessage(users), false, client) // Broadcast newly-joined client's details
+    
 }
 
 function sendWelcomeMessage(client: any): void {   
@@ -240,6 +246,10 @@ function validateUserProfile(profile: ClientProfile, server: WebSocketServer): P
 
     return { valid: valid, reason: reason }
 
+}
+
+function processUserDetailsMessage(clients: Array<ClientProfile>){
+    return JSON.stringify({type: "joinedUserDetailsMessage", content: JSON.stringify(clients)}); // User
 }
 
 function processServerMessage(message: string) : string {

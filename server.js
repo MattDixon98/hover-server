@@ -18,6 +18,7 @@ const GenerateHoverMessage_1 = require("./hover_generate_hover_message/GenerateH
 const MAX_CLIENTS = 2;
 const port = 9000;
 const server = new ws_1.WebSocketServer({ port: port });
+let users = [];
 let messageHistory = []; // Save message history
 server.on("connection", (socket, request) => {
     // Create connecting client's profile (id and username)
@@ -35,6 +36,9 @@ server.on("connection", (socket, request) => {
         if (code !== SocketClosureCodes_1.SocketClosureCodes.INVALID_REQUEST) {
             message = `${client.profile.user} has left the chat.`;
             broadcastMessage(server, processServerMessage(message), false, client); // Broadcast message to all clients
+            users = users.filter((removedUser) => {
+                return removedUser.id !== client.profile.id;
+            });
             console.log(`${client.profile.user} (id: ${client.profile.id}, role: ${client.profile.role}) has disconnected from the server.`);
         }
     });
@@ -70,6 +74,7 @@ function handleConnection(socket, request, client) {
     // Handle connection errors
     if (!error) {
         console.log(`${client.profile.user} (id: ${client.profile.id}, role: ${client.profile.role}) has connected to the server.`);
+        users.push(client.profile); // Add client to the global users list 
     }
     else {
         client.send(processServerMessage(message));
@@ -80,7 +85,8 @@ function handleConnection(socket, request, client) {
 function sendConnectionMessages(client) {
     const message = `${client.profile.user} has joined the chat.`;
     sendWelcomeMessage(client); // Send connecting client a welcome message
-    broadcastMessage(server, processServerMessage(message), true, client); // Broadcast message to all clients except current connecting
+    broadcastMessage(server, processServerMessage(message), true, client); // Broadcast server message to clients indicating the newly-joined client has joined
+    broadcastMessage(server, processUserDetailsMessage(users), false, client); // Broadcast newly-joined client's details
 }
 function sendWelcomeMessage(client) {
     const welcomeMessage = `Welcome to the chat, ${client.profile.user}! Hover is ready to go!`;
@@ -172,6 +178,9 @@ function validateUserProfile(profile, server) {
         reason += "\u2022 Role does not exist\n";
     }
     return { valid: valid, reason: reason };
+}
+function processUserDetailsMessage(clients) {
+    return JSON.stringify({ type: "joinedUserDetailsMessage", content: JSON.stringify(clients) }); // User
 }
 function processServerMessage(message) {
     return JSON.stringify({ type: "serverMessage", content: message }); // WebSocketCommunication Type
