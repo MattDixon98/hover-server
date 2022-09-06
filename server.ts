@@ -32,10 +32,15 @@ server.on("connection", (socket: WebSocket, request: http.IncomingMessage) => {
 
     // Create connecting client's profile (id and username)
     const client: any = socket;
-    client.profile = getClientProfile(request.url);
-
-    handleConnection(socket, request, client); // Handle an incoming client connection
-    sendConnectionMessages(client); // Send messages as a result of incoming client connection
+    client.profile = getClientProfile(request.url); // ClientProfile type
+    
+    // Handle an incoming client connection
+    if(handleConnection(socket, request, client)){
+        sendConnectionMessages(client); // Send messages as a result of incoming client connection
+    } else {
+        client.close(SocketClosureCodes.INVALID_REQUEST);
+    }
+    
 
     // Handle client disconnect
     client.on("close", (code: number, reason: Buffer) => {
@@ -71,7 +76,7 @@ server.on("connection", (socket: WebSocket, request: http.IncomingMessage) => {
 
 })
 
-function handleConnection(socket: WebSocket, request: http.IncomingMessage, client: any) : void {
+function handleConnection(socket: WebSocket, request: http.IncomingMessage, client: any) : boolean {
 
     let error: boolean = false;
     let message: string = "";
@@ -80,8 +85,7 @@ function handleConnection(socket: WebSocket, request: http.IncomingMessage, clie
     const clientUserProfileValidation: ProfileValidation = validateUserProfile(client.profile, server);
     if(!clientUserProfileValidation.valid){
 
-        message = clientUserProfileValidation.reason;
-        client.close(SocketClosureCodes.INVALID_REQUEST);
+        message = clientUserProfileValidation.reason + "\n";
         error = true;
 
     }
@@ -89,17 +93,24 @@ function handleConnection(socket: WebSocket, request: http.IncomingMessage, clie
     // If number of clients exceeds max, close the current connecting client's connection
     if(server.clients.size > MAX_CLIENTS){
 
-        message = `Connection failed: too many clients. This server permits a maximum of ${MAX_CLIENTS} clients at one time.`;
-        client.close(SocketClosureCodes.INVALID_REQUEST);
+        message = `Connection failed: too many clients. This server permits a maximum of ${MAX_CLIENTS} clients at one time.\n`;
         error = true;
 
     }
 
+    // If chat room already contains one of either facilitator or patient, close the current connecting client's connection
+    users.forEach((u: ClientProfile) => {
+        if(u.role && (u.role === client.profile.role)){
+            error = true;
+            message += `Connection failed: a ${client.profile.role} already exists in this room.\n`;
+            return;
+        }
+    })
+
     // If a username cannot be extracted from the client's query, close the current connecting client's connection
     if(!(client.profile.user && client.profile.role)){
 
-        message = "Connection failed: incorrect query provided. Please provide 'user' and 'role' query parameters in WebSocket request.";
-        client.close(SocketClosureCodes.INVALID_REQUEST);
+        message += "Connection failed: incorrect query provided. Please provide 'user' and 'role' query parameters in WebSocket request.\n";
         error = true;
 
     } 
@@ -112,11 +123,12 @@ function handleConnection(socket: WebSocket, request: http.IncomingMessage, clie
 
     } else { 
 
-        client.send(processServerMessage(message));
-        error = false;
+        client.send(processServerErrorMessage(message));
         console.log(`${client.profile.user} (id: ${client.profile.id}, role: ${client.profile.role}) unsuccessfully attempted to connect to the server.`);
 
-    } 
+    }
+    
+    return !error;
 
 }
 
@@ -253,9 +265,11 @@ function processUserDetailsMessage(clients: Array<ClientProfile>){
 }
 
 function processServerMessage(message: string) : string {
-
     return JSON.stringify({ type: "serverMessage", content: message }); // WebSocketCommunication Type
+}
 
+function processServerErrorMessage(message: string) : string {
+    return JSON.stringify({ type: "serverErrorMessage", content: message});
 }
 
 function processChatMessage(message: string, client: ClientProfile) : string {

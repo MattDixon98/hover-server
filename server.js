@@ -23,9 +23,14 @@ let messageHistory = []; // Save message history
 server.on("connection", (socket, request) => {
     // Create connecting client's profile (id and username)
     const client = socket;
-    client.profile = getClientProfile(request.url);
-    handleConnection(socket, request, client); // Handle an incoming client connection
-    sendConnectionMessages(client); // Send messages as a result of incoming client connection
+    client.profile = getClientProfile(request.url); // ClientProfile type
+    // Handle an incoming client connection
+    if (handleConnection(socket, request, client)) {
+        sendConnectionMessages(client); // Send messages as a result of incoming client connection
+    }
+    else {
+        client.close(SocketClosureCodes_1.SocketClosureCodes.INVALID_REQUEST);
+    }
     // Handle client disconnect
     client.on("close", (code, reason) => {
         let message = "";
@@ -55,20 +60,25 @@ function handleConnection(socket, request, client) {
     // If the client's user profile is not valid, close the current connecting client's connection
     const clientUserProfileValidation = validateUserProfile(client.profile, server);
     if (!clientUserProfileValidation.valid) {
-        message = clientUserProfileValidation.reason;
-        client.close(SocketClosureCodes_1.SocketClosureCodes.INVALID_REQUEST);
+        message = clientUserProfileValidation.reason + "\n";
         error = true;
     }
     // If number of clients exceeds max, close the current connecting client's connection
     if (server.clients.size > MAX_CLIENTS) {
-        message = `Connection failed: too many clients. This server permits a maximum of ${MAX_CLIENTS} clients at one time.`;
-        client.close(SocketClosureCodes_1.SocketClosureCodes.INVALID_REQUEST);
+        message = `Connection failed: too many clients. This server permits a maximum of ${MAX_CLIENTS} clients at one time.\n`;
         error = true;
     }
+    // If chat room already contains one of either facilitator or patient, close the current connecting client's connection
+    users.forEach((u) => {
+        if (u.role && (u.role === client.profile.role)) {
+            error = true;
+            message += `Connection failed: a ${client.profile.role} already exists in this room.\n`;
+            return;
+        }
+    });
     // If a username cannot be extracted from the client's query, close the current connecting client's connection
     if (!(client.profile.user && client.profile.role)) {
-        message = "Connection failed: incorrect query provided. Please provide 'user' and 'role' query parameters in WebSocket request.";
-        client.close(SocketClosureCodes_1.SocketClosureCodes.INVALID_REQUEST);
+        message += "Connection failed: incorrect query provided. Please provide 'user' and 'role' query parameters in WebSocket request.\n";
         error = true;
     }
     // Handle connection errors
@@ -77,10 +87,10 @@ function handleConnection(socket, request, client) {
         users.push(client.profile); // Add client to the global users list 
     }
     else {
-        client.send(processServerMessage(message));
-        error = false;
+        client.send(processServerErrorMessage(message));
         console.log(`${client.profile.user} (id: ${client.profile.id}, role: ${client.profile.role}) unsuccessfully attempted to connect to the server.`);
     }
+    return !error;
 }
 function sendConnectionMessages(client) {
     const message = `${client.profile.user} has joined the chat.`;
@@ -184,6 +194,9 @@ function processUserDetailsMessage(clients) {
 }
 function processServerMessage(message) {
     return JSON.stringify({ type: "serverMessage", content: message }); // WebSocketCommunication Type
+}
+function processServerErrorMessage(message) {
+    return JSON.stringify({ type: "serverErrorMessage", content: message });
 }
 function processChatMessage(message, client) {
     const currentDate = new Date();
