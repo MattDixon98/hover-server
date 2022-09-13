@@ -25,26 +25,27 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateTranscript = void 0;
 const fs = __importStar(require("fs"));
-const transcriptData = [
-    { messageContent: "Hi there :)", author: "jamierossiter", dateSent: "9:44 pm", role: "patient" },
-    { messageContent: "Hey how you going?", author: "mattdixon", dateSent: "9:45 pm", role: "facilitator" },
-    { messageContent: "Not bad actually. Yourself?", author: "jamierossiter", dateSent: "9:45 pm", role: "patient" },
-    { messageContent: "I just ate a whole bowl of nutrigrain", author: "mattdixon", dateSent: "9:47 pm", role: "facilitator" }
-];
+// const transcriptData: Array<TranscriptMessage> = [
+//     { messageContent: "Hi there :)", author: "jamierossiter", dateSent: "9:44 pm", role: "patient" },
+//     { messageContent: "Hey how you going?", author: "mattdixon", dateSent: "9:45 pm", role: "facilitator" },
+//     { messageContent: "Not bad actually. Yourself?", author: "jamierossiter", dateSent: "9:45 pm", role: "patient" },
+//     { messageContent: "I just ate a whole bowl of nutrigrain", author: "mattdixon", dateSent: "9:47 pm", role: "facilitator" }
+// ]
 function generateTranscript(messageHistory) {
     const currentDate = new Date();
-    const formattedDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}-${currentDate.getHours()}-${currentDate.getMinutes()}-${currentDate.getSeconds()}-${currentDate.getMilliseconds()}`;
-    const fileName = `./hover_transcript_generator/transcript_outputs/transcript_${formattedDate}.txt`;
+    const formattedDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}-${currentDate.getHours()}${currentDate.getMinutes()}${currentDate.getSeconds()}${currentDate.getMilliseconds()}`;
+    const fileName = `./hover_transcript_generator/transcript_outputs/transcript_${formattedDate}.csv`;
     // Create file
-    fs.writeFile(fileName, `Transcript ${formattedDate}\n\n`, (err) => {
+    fs.writeFile(fileName, "", (err) => {
         if (err)
             console.error(err);
     });
     const transcriptStream = fs.createWriteStream(fileName, {
         flags: "a"
     });
+    transcriptStream.write("author, role, dateSent, message, hoverComment\n");
     messageHistory.forEach((msg) => {
-        const line = `${msg.author} [${msg.role}] (${msg.dateSent}): ${msg.messageContent}\n`;
+        const line = `${msg.author}, ${msg.role}, ${msg.dateSent}, ${msg.messageContent}, ${msg.hoverComment}\n`;
         transcriptStream.write(line);
     });
     transcriptStream.end();

@@ -47,7 +47,6 @@ server.on("connection", (socket: WebSocket, request: http.IncomingMessage) => {
 
         let message: string = "";
 
-        // TODO: SAVE CHAT TRANSCRIPT TO FILE SERVER, THEN SAVE THE LINK TO THAT FILE IN DATABASE!
         if(messageHistory.length > 0) generateChatTranscript(messageHistory); // Generate chat transcript if there are messages in message history
         messageHistory = []; // Clear message history between clients
         
@@ -307,6 +306,8 @@ function generateChatTranscript(history: Array<string>){
         const parsedComm: WebSocketCommunication = JSON.parse(websocketcomm);
         const parsedContent: ChatMessageContent = JSON.parse(parsedComm.content);
         const parsedAuthor: { user: string, role: string } = { user: "Hover", role: "server" }
+        let parsedHoverComment: string = "";
+        let parsedMessage: string = "";
 
         // Check that author properties exist on parsedContent
         if(parsedContent.author.user){
@@ -316,7 +317,17 @@ function generateChatTranscript(history: Array<string>){
             parsedAuthor.role = parsedContent.author.role;
         }
 
-        return { messageContent: parsedContent.message, author: parsedAuthor.user, dateSent: parsedContent.date.toLocaleString(), role: parsedAuthor.role }
+        // Remove line breaks and commas from Hover comment for CSV format
+        if(parsedContent.hover.length > 0){
+            parsedHoverComment = parsedContent.hover.replace(/\n/g, " ").replace(/,/g, " ");
+        }
+
+        // Remove commas from message and Hover comments for CSV format
+        if(parsedContent.message.length > 0){
+            parsedMessage = parsedContent.message.replace(/,/g, " ");
+        }
+
+        return { messageContent: parsedMessage, author: parsedAuthor.user, dateSent: parsedContent.date.toLocaleString(), role: parsedAuthor.role, hoverComment: parsedHoverComment }
 
     })
 
