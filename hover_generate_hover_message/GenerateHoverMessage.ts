@@ -1,7 +1,9 @@
 import { AnalysisData } from "../AnalysisDataType";
 import { Repetition } from "../RepetitionInterface";
 import { Score } from "../ScoreType";
+// import { HoverMessage } from "../HoverMessageType";
 
+// export function generateHoverMessage(analysisData: AnalysisData): HoverMessage {
 export function generateHoverMessage(analysisData: AnalysisData): string {
     let message: string = "";
     // Check for repetition in the message
@@ -21,6 +23,11 @@ export function generateHoverMessage(analysisData: AnalysisData): string {
         message += `Patient's typing speed is ~${analysisData.typingSpeed} words per second.`;
     }
     return message.trim();
+    /*
+    Use this instead on line 23 when HoverMessageType is added
+    HoverMessage.message = message.trim();
+    HoverMessage.score = analysisData.score;
+    */
 }
 
 function createRepetitionComment(repetition: Repetition) : string {
