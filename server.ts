@@ -21,12 +21,14 @@ import { TranscriptMessage } from "./TranscriptMessageType";
 import { detectTypingSpeed } from "./hover_detect_typing_speed/DetectTypingSpeed";
 import { TypingSpeedMessage } from "./TypingSpeedMessageType";
 import { generateHoverMessage } from "./hover_generate_hover_message/GenerateHoverMessage";
+import { Score } from "./ScoreType";
 
 const MAX_CLIENTS: number = 2;
 const port: number = 9000;
 const server: WebSocketServer = new WebSocketServer({ port: port });
 let users: Array<ClientProfile> = [];
 let messageHistory: Array<string> = []; // Save message history
+let currentScore: Score = {anxiety: 0, depression: 0, risk: false};
 
 server.on("connection", (socket: WebSocket, request: http.IncomingMessage) => {
 
@@ -276,6 +278,8 @@ function processChatMessage(message: string, client: ClientProfile) : string {
     const currentDate: Date = new Date();
 
     const diagnosis: Diagnosis = createMessageDiagnosis(message);
+    
+    currentScore = calculateAverageSessionScore(currentScore, diagnosis.score);
 
     // If there is more than one message, calculate characters per second between most recently sent message and current message
     let typingSpeed: number = 0;
@@ -290,6 +294,8 @@ function processChatMessage(message: string, client: ClientProfile) : string {
         date: new Date(),
         hover: generateHoverMessage({
             score: diagnosis.score,
+            // Add this type into Generate Hover Message Type
+            //currentScore: currentScore,
             repetition: diagnosis.repetition,
             correctness: diagnosis.correctness,
             typingSpeed: typingSpeed
@@ -297,6 +303,14 @@ function processChatMessage(message: string, client: ClientProfile) : string {
     }
 
     return JSON.stringify({ type: "chatMessage", content: JSON.stringify(chatMessageContent) }); // WebSocketCommunication Type
+}
+
+function calculateAverageSessionScore(currentScore: Score, newScore: Score){
+    currentScore.anxiety = (currentScore.anxiety + newScore.anxiety)/2;
+    currentScore.anxiety = (currentScore.depression + newScore.depression)/2;
+    currentScore.risk = false;
+
+    return currentScore;
 }
 
 function generateChatTranscript(history: Array<string>){
