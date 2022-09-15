@@ -241,7 +241,7 @@ function generateChatTranscript(history) {
         if (parsedContent.message.length > 0) {
             parsedMessage = parsedContent.message.replace(/,/g, " ");
         }
-        return { messageContent: parsedContent.message, author: parsedAuthor.user, dateSent: parsedContent.date.toLocaleString(), role: parsedAuthor.role, hoverComment: parsedHoverComment };
+        return { messageContent: parsedMessage, author: parsedAuthor.user, dateSent: parsedContent.date.toLocaleString(), role: parsedAuthor.role, hoverComment: parsedHoverComment };
     });
     (0, transcript_generator_1.generateTranscript)(transcriptMessageObjects);
 }

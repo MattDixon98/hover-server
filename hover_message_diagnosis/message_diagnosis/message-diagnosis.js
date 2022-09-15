@@ -31,7 +31,8 @@ const pos = require("pos");
 const lemmatize = require("wink-lemmatizer");
 const synonyms = require("synonyms");
 const spellchecker = require("simple-spellchecker");
-const string_correctness_1 = require("../string_correctness/string-correctness");
+const string_correctness_1 = require("../../hover_string_correctness/string-correctness");
+const RepetitionAnalysis_1 = require("../../hover_repetition_analysis/RepetitionAnalysis");
 // Create POS tagger, for determining if words are nouns, adjectives or verbs
 const tagger = new pos.Tagger();
 // Create an array (list) of words with ratings from a text file
@@ -70,9 +71,9 @@ function createMessageDiagnosis(message) {
     return {
         analysedMessage: message,
         keywords: finalisedTokens,
-        repetition: analyseRepetition(tokenizedMessage),
+        repetition: (0, RepetitionAnalysis_1.analyseRepetition)(message),
         score: calculateMessageScore(finalisedTokens),
-        correctness: (0, string_correctness_1.stringCorrectness)(message)
+        correctness: parseFloat((0, string_correctness_1.stringCorrectness)(message))
     };
 }
 exports.createMessageDiagnosis = createMessageDiagnosis;
@@ -237,21 +238,6 @@ function spellCheckMessage(tokenizedMessage) {
         }
     });
     return suggestions;
-}
-function analyseRepetition(tokenizedMessage) {
-    const words = tokenizedMessage.map(tok => { return tok.word; });
-    let repetition = {};
-    words.forEach(w => {
-        repetition[w] = 0; // Init dynamic keys with a value of zero
-    });
-    words.forEach(w => {
-        repetition[w] = (repetition[w] || 0) + 1; // Iterate through each word and count number of times it is encountered
-    });
-    Object.keys(repetition).forEach(key => {
-        if (repetition[key] <= 1)
-            delete repetition[key]; // Delete entries that have not been counted more than once
-    });
-    return repetition;
 }
 function calculateMessageScore(tokens) {
     const finalScore = { anxiety: 0, depression: 0, risk: false };

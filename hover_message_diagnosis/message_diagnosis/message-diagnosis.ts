@@ -5,14 +5,14 @@ import { Diagnosis } from "../../DiagnosisType";
 import { Keyword } from "../../KeywordType";
 import { TagInitial } from "../../TagInitialType";
 import { WordLists } from "../..//WordListsType";
-import { Repetition } from "../../RepetitionInterface";
 import * as fs from "fs";
 import { Score } from "../../ScoreType";
 const pos = require("pos");
 const lemmatize = require("wink-lemmatizer");
 const synonyms = require("synonyms");
 const spellchecker = require("simple-spellchecker");
-import { stringCorrectness } from "../string_correctness/string-correctness";
+import { stringCorrectness } from "../../hover_string_correctness/string-correctness";
+import { analyseRepetition } from "../../hover_repetition_analysis/RepetitionAnalysis";
 
 // Create POS tagger, for determining if words are nouns, adjectives or verbs
 const tagger: any = new pos.Tagger();
@@ -60,9 +60,9 @@ export function createMessageDiagnosis(message: string):  Diagnosis {
     return {
         analysedMessage: message,
         keywords: finalisedTokens,
-        repetition: analyseRepetition(tokenizedMessage),
+        repetition: analyseRepetition(message),
         score: calculateMessageScore(finalisedTokens),
-        correctness: stringCorrectness(message)
+        correctness: parseFloat(stringCorrectness(message))
     };
 
 }
@@ -301,28 +301,6 @@ function spellCheckMessage(tokenizedMessage: Array<Keyword>): Array<Keyword> {
     })
 
     return suggestions;
-}
-
-function analyseRepetition(tokenizedMessage: Array<Keyword>): Repetition {
-
-    const words: Array<string> = tokenizedMessage.map(tok => { return tok.word });
-
-    let repetition: Repetition = {};
-    
-    words.forEach(w => {
-        repetition[w] = 0; // Init dynamic keys with a value of zero
-    })
-
-    words.forEach(w => {
-        repetition[w] = (repetition[w] || 0) + 1; // Iterate through each word and count number of times it is encountered
-    })
-
-    Object.keys(repetition).forEach(key => {
-        if(repetition[key] <= 1) delete repetition[key]; // Delete entries that have not been counted more than once
-    })
-
-    return repetition;
-
 }
 
 function calculateMessageScore(tokens: Array<Keyword>): Score {

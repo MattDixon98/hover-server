@@ -18,7 +18,7 @@ export function generateHoverMessage(analysisData: AnalysisData): string {
     }
     // Check for message speed
     if(analysisData.typingSpeed > 0){
-        message += `Patient's typing speed is ~${analysisData.typingSpeed} words per second.`;
+        message += `Patient's typing speed is ~${analysisData.typingSpeed} characters per second.`;
     }
     return message.trim();
 }
