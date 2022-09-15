@@ -1,8 +1,9 @@
-import { AnalysisData } from "../AnalysisDataType";
-import { Repetition } from "../RepetitionInterface";
-import { Score } from "../ScoreType";
+import { AnalysisData } from "../types/AnalysisDataType/AnalysisDataType";
+import { Repetition } from "../types/RepetitionInterface/RepetitionInterface";
+import { Score } from "../types/ScoreType/ScoreType";
+import { HoverMessage } from "../types/HoverMessageType/HoverMessageType";
 
-export function generateHoverMessage(analysisData: AnalysisData): string {
+export function generateHoverMessage(analysisData: AnalysisData): HoverMessage {
     let message: string = "";
     // Check for repetition in the message
     if(Object.keys(analysisData.repetition).length > 0){
@@ -20,7 +21,7 @@ export function generateHoverMessage(analysisData: AnalysisData): string {
     if(analysisData.typingSpeed > 0){
         message += `Patient's typing speed is ~${analysisData.typingSpeed} characters per second.`;
     }
-    return message.trim();
+    return { comment: message.trim(), score: analysisData.score };
 }
 
 function createRepetitionComment(repetition: Repetition) : string {

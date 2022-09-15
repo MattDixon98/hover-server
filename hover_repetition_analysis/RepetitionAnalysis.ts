@@ -1,4 +1,4 @@
-import { Repetition } from "../RepetitionInterface";
+import { Repetition } from "../types/RepetitionInterface/RepetitionInterface";
 
 export function analyseRepetition(message: string): Repetition {
 

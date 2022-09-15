@@ -1,5 +1,5 @@
-import { Repetition } from "./RepetitionInterface";
-import { Score } from "./ScoreType";
+import { Repetition } from "../RepetitionInterface/RepetitionInterface";
+import { Score } from "../ScoreType/ScoreType";
 
 export type AnalysisData = {
     score: Score,

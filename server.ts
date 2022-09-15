@@ -8,18 +8,18 @@ import WebSocket, { WebSocketServer } from "ws";
 import http from "http";
 import url from "url";
 import { v4 as uuidv4 } from "uuid";
-import { ClientProfile } from "./ClientProfileType";
-import { WebSocketCommunication } from "./WebSocketCommunicationType";
-import { ProfileValidation } from "./ProfileValidationType";
-import { SocketClosureCodes } from "./SocketClosureCodes";
-import { Keyword } from "./KeywordType";
+import { ClientProfile } from "./types/ClientProfileType/ClientProfileType";
+import { WebSocketCommunication } from "./types/WebSocketCommunicationType/WebSocketCommunicationType";
+import { ProfileValidation } from "./types/ProfileValidationType/ProfileValidationType";
+import { SocketClosureCodes } from "./types/SocketClosureCodes/SocketClosureCodes";
+import { Keyword } from "./types/KeywordType/KeywordType";
 import { createMessageDiagnosis } from "./hover_message_diagnosis/message_diagnosis/message-diagnosis";
-import { Diagnosis } from "./DiagnosisType";
-import { ChatMessageContent } from "./ChatMessageContentType";
+import { Diagnosis } from "./types/DiagnosisType/DiagnosisType";
+import { ChatMessageContent } from "./types/ChatMessageContentType/ChatMessageContentType";
 import { generateTranscript } from "./hover_transcript_generator/transcript_generator";
-import { TranscriptMessage } from "./TranscriptMessageType";
-import { detectTypingSpeed } from "./hover_detect_typing_speed/DetectTypingSpeed";
-import { TypingSpeedMessage } from "./TypingSpeedMessageType";
+import { TranscriptMessage } from "./types/TranscriptMessageType/TranscriptMessageType";
+import { detectTypingSpeed, flagTypingSpeed } from "./hover_detect_typing_speed/DetectTypingSpeed";
+import { TypingSpeedMessage } from "./types/TypingSpeedMessageType/TypingSpeedMessageType";
 import { generateHoverMessage } from "./hover_generate_hover_message/GenerateHoverMessage";
 
 const MAX_CLIENTS: number = 2;
@@ -162,7 +162,7 @@ function broadcastMessage(server: WebSocketServer, message: string, excludeCurre
 
 function getClientProfile(reqUrl: string | undefined): ClientProfile {
 
-    let profile: ClientProfile = { id: "", user: null, role: null };
+    let profile: ClientProfile = { id: "", user: null, role: null, typingSpeed: 0 };
 
     if(reqUrl){
         profile.id = uuidv4(); // Generate unique identifier
@@ -280,7 +280,7 @@ function processChatMessage(message: string, client: ClientProfile) : string {
     // If there is more than one message, calculate characters per second between most recently sent message and current message
     let typingSpeed: number = 0;
     if(messageHistory.length > 0){
-        typingSpeed = calculateTypingSpeed({message: message, date: currentDate}); // Use this to generate a Hover message.
+        typingSpeed = calculateTypingSpeed({message: message, date: currentDate}, client.id); // Use this to generate a Hover message.
     }
 
     const chatMessageContent: ChatMessageContent = {
@@ -318,8 +318,8 @@ function generateChatTranscript(history: Array<string>){
         }
 
         // Remove line breaks and commas from Hover comment for CSV format
-        if(parsedContent.hover.length > 0){
-            parsedHoverComment = parsedContent.hover.replace(/\n/g, " ").replace(/,/g, " ");
+        if(parsedContent.hover.comment.length > 0){
+            parsedHoverComment = parsedContent.hover.comment.replace(/\n/g, " ").replace(/,/g, " ");
         }
 
         // Remove commas from message and Hover comments for CSV format
@@ -327,7 +327,7 @@ function generateChatTranscript(history: Array<string>){
             parsedMessage = parsedContent.message.replace(/,/g, " ");
         }
 
-        return { messageContent: parsedMessage, author: parsedAuthor.user, dateSent: parsedContent.date.toLocaleString(), role: parsedAuthor.role, hoverComment: parsedHoverComment }
+        return { messageContent: parsedMessage, author: parsedAuthor.user, dateSent: parsedContent.date.toLocaleString(), role: parsedAuthor.role, hoverComment: parsedHoverComment, messageScore: parsedContent.hover.score }
 
     })
 
@@ -335,13 +335,15 @@ function generateChatTranscript(history: Array<string>){
 
 }
 
-function calculateTypingSpeed(current: {message: string, date: Date}): number {
+function calculateTypingSpeed(current: {message: string, date: Date}, userId: string ): number {
     const prevMsg: ChatMessageContent = JSON.parse(JSON.parse(messageHistory[messageHistory.length - 1]).content);
 
     const prevTypingSpeedMsg: TypingSpeedMessage = { content: prevMsg.message, timestamp: prevMsg.date };
     const currTypingSpeedMsg: TypingSpeedMessage = { content: current.message, timestamp: current.date }
 
     const messageSpeedDetection: number = detectTypingSpeed(prevTypingSpeedMsg, currTypingSpeedMsg);
+    const user: ClientProfile | undefined = users.find((user: ClientProfile) => user.id === userId);
+    if(user) user.typingSpeed = flagTypingSpeed(user.typingSpeed, messageSpeedDetection).speed; // TODO: Test to make sure this actually detects the global user's typing speed
 
     return messageSpeedDetection;
 

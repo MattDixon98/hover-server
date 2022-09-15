@@ -19,7 +19,7 @@ function generateHoverMessage(analysisData) {
     if (analysisData.typingSpeed > 0) {
         message += `Patient's typing speed is ~${analysisData.typingSpeed} characters per second.`;
     }
-    return message.trim();
+    return { comment: message.trim(), score: analysisData.score };
 }
 exports.generateHoverMessage = generateHoverMessage;
 function createRepetitionComment(repetition) {

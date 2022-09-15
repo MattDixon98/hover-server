@@ -22,11 +22,11 @@ export function generateTranscript(messageHistory: Array<TranscriptMessage>){
         flags: "a"
     });
 
-    transcriptStream.write("author, role, dateSent, message, hoverComment\n");
+    transcriptStream.write("author, role, dateSent, message, hoverComment, anxietyScore, depressionScore, riskFlag\n");
 
     messageHistory.forEach((msg: TranscriptMessage) => {
 
-        const line: string = `${msg.author}, ${msg.role}, ${msg.dateSent}, ${msg.messageContent}, ${msg.hoverComment}\n`;
+        const line: string = `${msg.author}, ${msg.role}, ${msg.dateSent}, ${msg.messageContent}, ${msg.hoverComment}, ${msg.messageScore.anxiety}, ${msg.messageScore.depression}, ${msg.messageScore.risk}\n`;
         transcriptStream.write(line);
 
     })

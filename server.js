@@ -10,7 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const ws_1 = require("ws");
 const url_1 = __importDefault(require("url"));
 const uuid_1 = require("uuid");
-const SocketClosureCodes_1 = require("./SocketClosureCodes");
+const SocketClosureCodes_1 = require("./types/SocketClosureCodes/SocketClosureCodes");
 const message_diagnosis_1 = require("./hover_message_diagnosis/message_diagnosis/message-diagnosis");
 const transcript_generator_1 = require("./hover_transcript_generator/transcript_generator");
 const DetectTypingSpeed_1 = require("./hover_detect_typing_speed/DetectTypingSpeed");
@@ -113,7 +113,7 @@ function broadcastMessage(server, message, excludeCurrentClient, currentClient) 
     });
 }
 function getClientProfile(reqUrl) {
-    let profile = { id: "", user: null, role: null };
+    let profile = { id: "", user: null, role: null, typingSpeed: 0 };
     if (reqUrl) {
         profile.id = (0, uuid_1.v4)(); // Generate unique identifier
         profile.user = extractDataFromUrl(url_1.default.parse(reqUrl), "user"); // Extract user name from query params
@@ -203,7 +203,7 @@ function processChatMessage(message, client) {
     // If there is more than one message, calculate characters per second between most recently sent message and current message
     let typingSpeed = 0;
     if (messageHistory.length > 0) {
-        typingSpeed = calculateTypingSpeed({ message: message, date: currentDate }); // Use this to generate a Hover message.
+        typingSpeed = calculateTypingSpeed({ message: message, date: currentDate }, client.id); // Use this to generate a Hover message.
     }
     const chatMessageContent = {
         message: diagnosis.analysedMessage,
@@ -234,22 +234,25 @@ function generateChatTranscript(history) {
             parsedAuthor.role = parsedContent.author.role;
         }
         // Remove line breaks and commas from Hover comment for CSV format
-        if (parsedContent.hover.length > 0) {
-            parsedHoverComment = parsedContent.hover.replace(/\n/g, " ").replace(/,/g, " ");
+        if (parsedContent.hover.comment.length > 0) {
+            parsedHoverComment = parsedContent.hover.comment.replace(/\n/g, " ").replace(/,/g, " ");
         }
         // Remove commas from message and Hover comments for CSV format
         if (parsedContent.message.length > 0) {
             parsedMessage = parsedContent.message.replace(/,/g, " ");
         }
-        return { messageContent: parsedMessage, author: parsedAuthor.user, dateSent: parsedContent.date.toLocaleString(), role: parsedAuthor.role, hoverComment: parsedHoverComment };
+        return { messageContent: parsedMessage, author: parsedAuthor.user, dateSent: parsedContent.date.toLocaleString(), role: parsedAuthor.role, hoverComment: parsedHoverComment, messageScore: parsedContent.hover.score };
     });
     (0, transcript_generator_1.generateTranscript)(transcriptMessageObjects);
 }
-function calculateTypingSpeed(current) {
+function calculateTypingSpeed(current, userId) {
     const prevMsg = JSON.parse(JSON.parse(messageHistory[messageHistory.length - 1]).content);
     const prevTypingSpeedMsg = { content: prevMsg.message, timestamp: prevMsg.date };
     const currTypingSpeedMsg = { content: current.message, timestamp: current.date };
     const messageSpeedDetection = (0, DetectTypingSpeed_1.detectTypingSpeed)(prevTypingSpeedMsg, currTypingSpeedMsg);
+    const user = users.find((user) => user.id === userId);
+    if (user)
+        user.typingSpeed = (0, DetectTypingSpeed_1.flagTypingSpeed)(user.typingSpeed, messageSpeedDetection).speed; // TODO: Test to make sure this actually detects the global user's typing speed
     return messageSpeedDetection;
 }
 console.log(`Hover Server v1.0 is running on port ${port}`);

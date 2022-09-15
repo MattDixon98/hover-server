@@ -43,9 +43,9 @@ function generateTranscript(messageHistory) {
     const transcriptStream = fs.createWriteStream(fileName, {
         flags: "a"
     });
-    transcriptStream.write("author, role, dateSent, message, hoverComment\n");
+    transcriptStream.write("author, role, dateSent, message, hoverComment, messageScore\n");
     messageHistory.forEach((msg) => {
-        const line = `${msg.author}, ${msg.role}, ${msg.dateSent}, ${msg.messageContent}, ${msg.hoverComment}\n`;
+        const line = `${msg.author}, ${msg.role}, ${msg.dateSent}, ${msg.messageContent}, ${msg.hoverComment}, ${msg.messageScore}\n`;
         transcriptStream.write(line);
     });
     transcriptStream.end();

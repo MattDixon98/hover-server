@@ -1,12 +1,12 @@
 /* TODO: 
 */
 
-import { Diagnosis } from "../../DiagnosisType";
-import { Keyword } from "../../KeywordType";
-import { TagInitial } from "../../TagInitialType";
-import { WordLists } from "../..//WordListsType";
+import { Diagnosis } from "../../types/DiagnosisType/DiagnosisType";
+import { Keyword } from "../../types/KeywordType/KeywordType";
+import { TagInitial } from "../../types/TagInitialType/TagInitialType";
+import { WordLists } from "../../types/WordListsType/WordListsType";
 import * as fs from "fs";
-import { Score } from "../../ScoreType";
+import { Score } from "../../types/ScoreType/ScoreType";
 const pos = require("pos");
 const lemmatize = require("wink-lemmatizer");
 const synonyms = require("synonyms");
