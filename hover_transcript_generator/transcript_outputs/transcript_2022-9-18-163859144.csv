@@ -1,0 +1,4 @@
+author, role, dateSent, message, hoverComment, anxietyScore, depressionScore, riskFlag
+jamierossiter, patient, 2022-09-18T06:38:38.460Z, hi matt im very anxious at the moment, Patient is displaying signs of anxiety., 3, 0, false
+jamierossiter, patient, 2022-09-18T06:38:45.827Z, how r u, Patient's typing speed is ~0.95 characters per second., 0, 0, false
+jamierossiter, patient, 2022-09-18T06:38:50.796Z, im so anxious, Patient is displaying signs of anxiety. Patient's typing speed is ~2.64 characters per second.Patient seems to be exhibiting mild anxiety and mild depression. Consider using  <a href=/therapeuticModel/sfbt>SFBT</a>, 3, 0, false

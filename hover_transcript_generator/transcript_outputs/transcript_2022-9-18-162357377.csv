@@ -1,0 +1,5 @@
+author, role, dateSent, message, hoverComment, anxietyScore, depressionScore, riskFlag
+mattdixon, facilitator, 2022-09-18T06:23:19.970Z, hi jamie, , 0, 0, false
+jamierossiter, patient, 2022-09-18T06:23:27.398Z, hi matt  im quite sad at the moment, Patient is displaying signs of depression. Patient's typing speed is ~4.78 characters per second., 0, 2, false
+mattdixon, facilitator, 2022-09-18T06:23:40.990Z, hi matt im quite anxious at the moment, Patient is displaying signs of anxiety. Patient's typing speed is ~2.81 characters per second., 3, 0, false
+jamierossiter, patient, 2022-09-18T06:23:52.913Z, hi matt im quite anxious at the moment, Patient is displaying signs of anxiety. Patient's typing speed is ~3.2 characters per second., 3, 0, false

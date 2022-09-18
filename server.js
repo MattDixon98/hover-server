@@ -19,7 +19,7 @@ const MAX_CLIENTS = 2;
 const port = 9000;
 const server = new ws_1.WebSocketServer({ port: port });
 let users = [];
-let messageHistory = []; // Save message history
+let messageHistory = []; // WebSocketCommunication: type: "chatMessage" | "serverMessage", content: stringified JSON [message: string, keywords: Array<string>, author: ClientProfile, date: Date, hover: HoverMessage[comment: string, score: Score]]
 server.on("connection", (socket, request) => {
     // Create connecting client's profile (id and username)
     const client = socket;
@@ -49,7 +49,6 @@ server.on("connection", (socket, request) => {
     // Handle message reception
     socket.on("message", msg => {
         const receivedMessage = processChatMessage(msg.toString(), client.profile);
-        messageHistory.push(receivedMessage); // Add to message history
         broadcastMessage(server, receivedMessage, false, client); // Broadcast message to all clients
     });
 });
@@ -211,13 +210,40 @@ function processChatMessage(message, client) {
         author: client,
         date: new Date(),
         hover: (0, GenerateHoverMessage_1.generateHoverMessage)({
-            score: diagnosis.score,
+            rollingScore: generateRollingScore(client.id, messageHistory),
+            newScore: diagnosis.score,
             repetition: diagnosis.repetition,
             correctness: diagnosis.correctness,
             typingSpeed: typingSpeed
         })
     };
+    messageHistory.push(JSON.stringify({ content: JSON.stringify(chatMessageContent) })); // Add to message history
     return JSON.stringify({ type: "chatMessage", content: JSON.stringify(chatMessageContent) }); // WebSocketCommunication Type
+}
+function generateRollingScore(clientId, history) {
+    const idScoresArray = [];
+    history.forEach((msg) => {
+        const userIdAndScore = { id: "", score: { anxiety: 0, depression: 0, risk: false } };
+        const parsedMsg = JSON.parse(msg);
+        if (parsedMsg) {
+            userIdAndScore.id = JSON.parse(parsedMsg.content).author.id;
+            userIdAndScore.score = JSON.parse(parsedMsg.content).hover.score;
+        }
+        else
+            return;
+        idScoresArray.push(userIdAndScore);
+    });
+    const filteredIdScores = idScoresArray.filter((idScore) => {
+        return idScore.id === clientId;
+    });
+    let finalScore = { anxiety: 0, depression: 0, risk: false };
+    filteredIdScores.forEach((idScore) => {
+        if (idScore.id && idScore.score) {
+            finalScore.anxiety = finalScore.anxiety + idScore.score.anxiety;
+            finalScore.depression = finalScore.depression + idScore.score.depression;
+        }
+    });
+    return finalScore;
 }
 function generateChatTranscript(history) {
     const transcriptMessageObjects = history.map(websocketcomm => {

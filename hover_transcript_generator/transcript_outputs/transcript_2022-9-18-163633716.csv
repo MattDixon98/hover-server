@@ -1,0 +1,5 @@
+author, role, dateSent, message, hoverComment, anxietyScore, depressionScore, riskFlag
+mattdixon, facilitator, 2022-09-18T06:36:03.602Z, hi jamie, , 0, 0, false
+mattdixon, facilitator, 2022-09-18T06:36:06.328Z, how are you?, Patient's typing speed is ~4.51 characters per second., 0, 0, false
+jamierossiter, patient, 2022-09-18T06:36:13.758Z, i am extremely anxious, Patient is displaying signs of anxiety. Patient's typing speed is ~2.97 characters per second., 3, 0, false
+jamierossiter, patient, 2022-09-18T06:36:26.673Z, like really anxious, Patient is displaying signs of anxiety. Patient's typing speed is ~1.48 characters per second.Patient seems to be exhibiting mild anxiety and mild depression. Consider using  <a href=/therapeuticModel/sfbt>SFBT</a>, 3, 0, false

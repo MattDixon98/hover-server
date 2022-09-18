@@ -2,6 +2,7 @@ import { AnalysisData } from "../types/AnalysisDataType/AnalysisDataType";
 import { Repetition } from "../types/RepetitionInterface/RepetitionInterface";
 import { Score } from "../types/ScoreType/ScoreType";
 import { HoverMessage } from "../types/HoverMessageType/HoverMessageType";
+import { generateFacilitatorSuggestion } from "../hover_facilitator_suggestion/FacilitatorSuggestion";
 
 export function generateHoverMessage(analysisData: AnalysisData): HoverMessage {
     let message: string = "";
@@ -10,8 +11,8 @@ export function generateHoverMessage(analysisData: AnalysisData): HoverMessage {
         message += createRepetitionComment(analysisData.repetition);
     }
     // Check for anxiety, depression and risk scores
-    if(analysisData.score.anxiety || analysisData.score.depression || analysisData.score.risk){
-        message += createScoreComment(analysisData.score);
+    if(analysisData.newScore.anxiety || analysisData.newScore.depression || analysisData.newScore.risk){
+        message += createScoreComment(analysisData.newScore);
     }
     // Check for correctness of message
     if(analysisData.correctness < 100){
@@ -19,9 +20,15 @@ export function generateHoverMessage(analysisData: AnalysisData): HoverMessage {
     }
     // Check for message speed
     if(analysisData.typingSpeed > 0){
-        message += `Patient's typing speed is ~${analysisData.typingSpeed} characters per second.`;
+        message += `Patient's typing speed is ~${analysisData.typingSpeed} characters per second.\n`;
     }
-    return { comment: message.trim(), score: analysisData.score };
+    // Check for facilitator suggestion
+    const facilitatorSuggestion = generateFacilitatorSuggestion(analysisData.rollingScore.anxiety, analysisData.rollingScore.depression, analysisData.newScore.anxiety, analysisData.newScore.depression)
+    if(facilitatorSuggestion.therapyType.trim().length > 0){
+        message += `${facilitatorSuggestion.text} <a target="_blank" href=${facilitatorSuggestion.link}>${facilitatorSuggestion.therapyType}</a>.\n`
+    }
+
+    return { comment: message.trim(), score: analysisData.newScore };
 }
 
 function createRepetitionComment(repetition: Repetition) : string {
