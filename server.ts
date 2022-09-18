@@ -22,12 +22,13 @@ import { detectTypingSpeed, flagTypingSpeed } from "./hover_detect_typing_speed/
 import { TypingSpeedMessage } from "./types/TypingSpeedMessageType/TypingSpeedMessageType";
 import { generateHoverMessage } from "./hover_generate_hover_message/GenerateHoverMessage";
 import { Score } from "./types/ScoreType/ScoreType";
+import { TypingSpeedAnalysis } from "./types/TypingSpeedAnalysisType/TypingSpeedAnalysisType";
 
 const MAX_CLIENTS: number = 2;
 const port: number = 9000;
 const server: WebSocketServer = new WebSocketServer({ port: port });
 let users: Array<ClientProfile> = [];
-let messageHistory: Array<string> = []; // WebSocketCommunication: type: "chatMessage" | "serverMessage", content: stringified JSON [message: string, keywords: Array<string>, author: ClientProfile, date: Date, hover: HoverMessage[comment: string, score: Score]]
+let messageHistory: Array<string> = []; // ChatMessageContent - content: stringified JSON [message: string, keywords: Array<string>, author: ClientProfile, date: Date, hover: HoverMessage[comment: string, score: Score]]
 
 server.on("connection", (socket: WebSocket, request: http.IncomingMessage) => {
 
@@ -277,10 +278,13 @@ function processChatMessage(message: string, client: ClientProfile) : string {
     const diagnosis: Diagnosis = createMessageDiagnosis(message);
 
     // If there is more than one message, calculate characters per second between most recently sent message and current message
-    let typingSpeed: number = 0;
+    let typingSpeed: TypingSpeedAnalysis = { message: "", anx_score: 0, speed: 0 };
     if(messageHistory.length > 0){
         typingSpeed = calculateTypingSpeed({message: message, date: currentDate}, client.id); // Use this to generate a Hover message.
+        diagnosis.score.anxiety += typingSpeed.anx_score; // Add typing speed anxiety score to diagnosis anxiety
     }
+
+    console.log("Diagnosis Score", diagnosis.score);
 
     const chatMessageContent: ChatMessageContent = {
         message: diagnosis.analysedMessage,
@@ -326,6 +330,12 @@ function generateRollingScore(clientId: string, history: Array<string>): Score {
         }
     })
 
+    finalScore.anxiety = finalScore.anxiety / filteredIdScores.length;
+    finalScore.depression = finalScore.depression / filteredIdScores.length;
+
+    // console.log("Average anxiety score", finalScore.anxiety);
+    // console.log("Average depression score", finalScore.depression);
+
     return finalScore;
 }
 
@@ -365,7 +375,7 @@ function generateChatTranscript(history: Array<string>){
 
 }
 
-function calculateTypingSpeed(current: {message: string, date: Date}, userId: string ): number {
+function calculateTypingSpeed(current: {message: string, date: Date}, userId: string ): TypingSpeedAnalysis {
     const prevMsg: ChatMessageContent = JSON.parse(JSON.parse(messageHistory[messageHistory.length - 1]).content);
 
     const prevTypingSpeedMsg: TypingSpeedMessage = { content: prevMsg.message, timestamp: prevMsg.date };
@@ -373,10 +383,13 @@ function calculateTypingSpeed(current: {message: string, date: Date}, userId: st
 
     const messageSpeedDetection: number = detectTypingSpeed(prevTypingSpeedMsg, currTypingSpeedMsg);
     const user: ClientProfile | undefined = users.find((user: ClientProfile) => user.id === userId);
-    if(user) user.typingSpeed = flagTypingSpeed(user.typingSpeed, messageSpeedDetection).speed; // TODO: Test to make sure this actually detects the global user's typing speed
-
-    return messageSpeedDetection;
-
+    if(user){
+        const flagged: TypingSpeedAnalysis = flagTypingSpeed(user.typingSpeed, messageSpeedDetection, messageHistory);
+        user.typingSpeed = flagged.speed; // TODO: Test to make sure this actually detects the global user's typing speed
+        return flagged;
+    } else {
+        return { message: "", anx_score: 0, speed: 0 }
+    }
 }
 
 console.log(`Hover Server v1.0 is running on port ${port}`);

@@ -14,24 +14,18 @@ const spellchecker = require("simple-spellchecker");
 import { stringCorrectness } from "../../hover_string_correctness/string-correctness";
 import { analyseRepetition } from "../../hover_repetition_analysis/RepetitionAnalysis";
 
+type WordListItem = {
+    word: string, dpr_score: number, anx_score: number, risk_flag: number
+}
+
 // Create POS tagger, for determining if words are nouns, adjectives or verbs
 const tagger: any = new pos.Tagger();
 
 // Create an array (list) of words with ratings from a text file
-function createWordRatingListFromFile(filePath: string): Array<[string, number]> {
-    let file = fs.readFileSync(filePath);
-    const list: Array<string> = file.toString("utf-8").split("\n");
-    const formattedList: Array<[string, number]> = [];
-    list.forEach((wordAndRating: string) => {
-        if(!(wordAndRating.trim().length > 0)){
-            return;
-        }
-        const split: Array<string> = wordAndRating.split(":");
-        const word = split[0].trim();
-        const rating = parseInt(split[1].trim());
-        formattedList.push([word, rating]);
-    })
-    return formattedList;
+export function createWordRatingListFromDictionaryJson(): Array<WordListItem> {
+    let file: Buffer = fs.readFileSync("./hover_message_diagnosis/wordlists/dictionary.json");
+    const list: Array<WordListItem> = JSON.parse(file.toString()).dictionary;
+    return list;
 }
 
 function createWordListFromFile(filePath: string): Array<string> {
@@ -44,18 +38,14 @@ function createWordListFromFile(filePath: string): Array<string> {
 export function createMessageDiagnosis(message: string):  Diagnosis {
 
      // List of words extracted from external text files containing categories of words
-    const externalWordLists: WordLists = {
-        anxiety: createWordRatingListFromFile("./hover_message_diagnosis/wordlists/anxiety_wordlist.txt"),
-        depression: createWordRatingListFromFile("./hover_message_diagnosis/wordlists/depression_wordlist.txt"),
-        risk: createWordRatingListFromFile("./hover_message_diagnosis/wordlists/risk_wordlist.txt")
-    }
+    const externalWordList: Array<WordListItem> = createWordRatingListFromDictionaryJson();
 
     const tokenizedMessage: Array<Keyword> = tokenizeMessage(message); // Split the message into indiviual "tokens" that take the form of Keyword types
 
     const spellCheckedTokens: Array<Keyword> = tokenizedMessage.concat(spellCheckMessage(tokenizedMessage)); // Concatenate the tokenized message with spellcheck suggestions and perform spell check on original message (not keywords)
 
-    const optimisedTokens: Array<Keyword> = optimiseTokens(spellCheckedTokens); // Lemmatized and synonymized list of keywords
-    const finalisedTokens: Array<Keyword> = finaliseTokens(optimisedTokens, externalWordLists, message); // Filter tokens based on external word lists, flag tokens with "anxiety", "depression", "risk" and assign positions of tokens based on original message
+    const optimisedTokens: Array<Keyword> = optimiseTokens(spellCheckedTokens); // Synonymized list of keywords (no longer lemmatized)
+    const finalisedTokens: Array<Keyword> = finaliseTokens(optimisedTokens, externalWordList, message); // Filter tokens based on external word lists, flag tokens with "anxiety", "depression", "risk" and assign positions of tokens based on original message
 
     return {
         analysedMessage: message,
@@ -72,7 +62,7 @@ function tokenizeMessage(message: string): Array<Keyword> {
 
     const tokenized = removeStopwords(message.toLowerCase().split(" "));
     return tokenized.map(word => {
-        let token: Keyword = { word: word, score: 0, derived: word, flag: null, position: null };
+        let token: Keyword = { word: word, score: { anxiety: 0, depression: 0, risk: false }, derived: word, flag: null, position: null };
         return token;
     })
     
@@ -117,14 +107,13 @@ function removeStopwords(tokenizedMessage: Array<string>): Array<string>{
 // Lemmatize and synonymize all analysis words
 function optimiseTokens(analysisWords: Array<Keyword>): Array<Keyword> {
 
-    const keywordListPosForLemm: Array<[Keyword, string]> = getWordPosInKeywordList(analysisWords);
+    // const keywordListPosForLemm: Array<[Keyword, string]> = getWordPosInKeywordList(analysisWords);
+    // const keywordListLemmatized: Array<Keyword> = lemmatizeKeywordList(keywordListPosForLemm); // Lemmatize words from analysis
 
-    const keywordListLemmatized: Array<Keyword> = lemmatizeKeywordList(keywordListPosForLemm); // Lemmatize words from analysis
-
-    const keywordListPosForSyno: Array<[Keyword, string]> = getWordPosInKeywordList(keywordListLemmatized); 
+    const keywordListPosForSyno: Array<[Keyword, string]> = getWordPosInKeywordList(analysisWords); 
     const keywordListSynonymized: Array<Keyword> = synonymizeKeywordList(keywordListPosForSyno); // Synonymize lemmatized analysis words
 
-    const amalgamatedWordList: Array<Keyword> = keywordListLemmatized.concat(keywordListSynonymized); // Combine the lemmatized and synonymized word lists together
+    const amalgamatedWordList: Array<Keyword> = analysisWords.concat(keywordListSynonymized); // Combine the original analysis words and synonymized word list together
     const keywordListOptimised: Array<Keyword> = removeDuplicatesFromKeywordList(amalgamatedWordList); // Remove duplicates
 
     return keywordListOptimised;
@@ -132,30 +121,34 @@ function optimiseTokens(analysisWords: Array<Keyword>): Array<Keyword> {
 }
 
 // Filter tokens based on word lists, flag them appropriately (anxiety, depression, risk) and assign their positions based on original message
-function finaliseTokens(tokens: Array<Keyword>, wordLists: WordLists, message: string) : Array<Keyword> {
+function finaliseTokens(tokens: Array<Keyword>, wordList: Array<WordListItem>, message: string) : Array<Keyword> {
 
     let tokenFlags: Array<Keyword> = [];
-    const lists: Array<[string, Array<[string, number]>]> = Object.entries(wordLists); // This is an array of tuples, with each tuple containing [ word list name, word list contents ]
 
     tokens.forEach((tok: Keyword) => {
 
-        lists.forEach((list: [string, Array<[string, number]>]) => {
-
-            const listKey: string = list[0];
-            const listValue: Array<[string, number]> = list[1];
-
-            listValue.forEach((value: [string, number]) => {
-                if(value[0] == tok.word){
-                    tokenFlags.push({word: tok.word, score: value[1], flag: listKey, derived: tok.derived, position: getTokenPositionInMessage(tok.derived, message)});
-                }
-                
-            })
-
+        wordList.forEach((item: WordListItem) => {
+            const isScored: boolean = (item.anx_score > 0) || (item.dpr_score > 0) || (item.risk_flag != 0);
+            if(item.word === tok.word && isScored) tokenFlags.push({word: tok.word, score: {anxiety: item.anx_score, depression: item.dpr_score, risk: item.risk_flag ? true : false }, flag: determineWordFlag(item.anx_score, item.dpr_score, item.risk_flag), derived: tok.derived, position: getTokenPositionInMessage(tok.derived, message)});
         })
 
     })
 
     return tokenFlags;
+
+}
+
+function determineWordFlag(anx_score: number, dpr_score: number, risk_flag: number): string {
+
+    let flag: string = "";
+
+    if((anx_score > 0 || dpr_score > 0)){
+        flag = (anx_score > dpr_score) ? "anxiety" : "depression";
+    }
+
+    if(risk_flag > 0) flag = "risk";
+
+    return flag;
 
 }
 
@@ -238,7 +231,7 @@ function synonymizeKeywordList(wordListPos: Array<[Keyword, string]>): Array<Key
                     synonymized.push(
                         {
                             word: synonym,
-                            score: 0,
+                            score: { depression: 0, anxiety: 0, risk: false },
                             derived: wordPos[0].derived, // The derived word is the word that was in the original message,
                             flag: null,
                             position: wordPos[0].position
@@ -251,7 +244,7 @@ function synonymizeKeywordList(wordListPos: Array<[Keyword, string]>): Array<Key
                     synonymized.push(
                         {
                             word: synonym,
-                            score: 0,
+                            score: { depression: 0, anxiety: 0, risk: false },
                             derived: wordPos[0].derived, // The derived word is the word that was in the original message
                             flag: null,
                             position: wordPos[0].position 
@@ -264,7 +257,7 @@ function synonymizeKeywordList(wordListPos: Array<[Keyword, string]>): Array<Key
                     synonymized.push(
                         {
                             word: synonym,
-                            score: 0,
+                            score: { depression: 0, anxiety: 0, risk: false },
                             derived: wordPos[0].derived, // The derived word is the word that was in the original message
                             flag: null,
                             position: wordPos[0].position
@@ -292,7 +285,7 @@ function spellCheckMessage(tokenizedMessage: Array<Keyword>): Array<Keyword> {
         if(!dictionary.spellCheck(token.word)){
 
             dictionary.getSuggestions(token.word).forEach( (sugg: any) => { 
-                let keyword: Keyword = { word: sugg, score: 0, derived: token.word, flag: null, position: token.position };
+                let keyword: Keyword = { word: sugg, score: { depression: 0, anxiety: 0, risk: false }, derived: token.word, flag: null, position: token.position };
                 suggestions.push(keyword); 
             });
     
@@ -309,7 +302,7 @@ function calculateMessageScore(tokens: Array<Keyword>): Score {
         if(tok.flag){
             
             if((tok.flag === "anxiety" || tok.flag === "depression")){
-                finalScore[tok.flag] += tok.score;
+                finalScore[tok.flag] += tok.score[tok.flag];
             }
 
             if(tok.flag === "risk"){

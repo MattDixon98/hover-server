@@ -1,0 +1,76 @@
+author, role, dateSent, message, hoverComment, anxietyScore, depressionScore, riskFlag
+jamierossiter, facilitator, 2022-09-18T11:49:44.480Z, Hi Rebecca!, , 0, 0, false
+rebeccachambers, patient, 2022-09-18T11:49:54.705Z, Hi Jamie  how are you?, Patient's typing speed is ~2.17 characters per second., 0, 0, false
+jamierossiter, facilitator, 2022-09-18T11:50:03.774Z, Pretty good! And yourself?, Patient's typing speed is ~2.88 characters per second., 0, 0, false
+rebeccachambers, patient, 2022-09-18T11:50:17.035Z, I'm experiencing depression, Patient is displaying signs of depression. Patient's typing speed is ~2.04 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:50:24.411Z, im quite sad, Patient is displaying signs of depression. Patient's typing speed is ~1.64 characters per second., 0, 2, false
+rebeccachambers, patient, 2022-09-18T11:50:34.018Z, like very very sad, Patient is displaying signs of depression. Patient's typing speed is ~1.88 characters per second., 0, 2, false
+rebeccachambers, patient, 2022-09-18T11:50:43.069Z, and extremely depression, Patient is displaying signs of depression. Patient's typing speed is ~2.66 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:50:45.931Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~3.52 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:50:50.702Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~2.1 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:50:52.316Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~6.26 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:50:54.148Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~5.51 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:50:56.012Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~5.41 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:50:57.913Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~5.31 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:01.226Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~3.03 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:03.900Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~3.76 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:06.503Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~3.87 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:08.911Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~4.18 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:10.923Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~5.01 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:15.513Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~2.19 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:17.157Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~6.14 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:19.138Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~5.1 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:20.509Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~7.38 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:26.729Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~1.61 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:27.635Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~11.29 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:28.187Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~18.83 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:28.536Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~30.03 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:28.820Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~37.31 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:29.448Z, depressiondepression, Patient wrote message with 0% correctness. Patient's typing speed is ~34.84 characters per second., 0, 0, false
+rebeccachambers, patient, 2022-09-18T11:51:30.263Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~12.58 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:30.904Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~16.13 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:31.441Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~19.27 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:31.964Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~19.76 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:32.509Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~19.05 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:33.061Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~18.8 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:33.627Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~18.28 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:35.393Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~5.71 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:36.040Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~15.87 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:36.750Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~14.41 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:37.355Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~16.98 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:38.019Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~15.43 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:38.660Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~15.97 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:39.459Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~12.77 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:40.074Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~16.78 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:40.711Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~16.1 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:41.284Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~17.95 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:45.439Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~2.42 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:45.744Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~34.72 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:46.096Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~30.03 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:48.522Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~4.16 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:49.067Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~19.05 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:49.591Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~19.65 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:50.128Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~19.34 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:50.656Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~19.69 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:51.187Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~19.61 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:51.724Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~19.19 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:52.233Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~20.28 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:52.756Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~19.69 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:53.293Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~19.53 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:53.783Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~21.14 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:54.306Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~19.76 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:54.835Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~19.53 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:55.331Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~20.88 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:55.847Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~20.04 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:56.366Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~19.92 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:56.916Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~18.9 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:57.424Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~20.28 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:57.949Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~19.8 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:58.489Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~19.27 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:51:59.054Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~18.21 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:52:00.846Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~5.65 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:52:01.413Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~18.28 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:52:01.924Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~20.12 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:52:02.481Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~18.52 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:52:03.018Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~19.16 characters per second., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:52:03.558Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~19.08 characters per second., 0, 3, false

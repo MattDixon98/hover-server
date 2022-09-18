@@ -19,7 +19,7 @@ const MAX_CLIENTS = 2;
 const port = 9000;
 const server = new ws_1.WebSocketServer({ port: port });
 let users = [];
-let messageHistory = []; // WebSocketCommunication: type: "chatMessage" | "serverMessage", content: stringified JSON [message: string, keywords: Array<string>, author: ClientProfile, date: Date, hover: HoverMessage[comment: string, score: Score]]
+let messageHistory = []; // ChatMessageContent - content: stringified JSON [message: string, keywords: Array<string>, author: ClientProfile, date: Date, hover: HoverMessage[comment: string, score: Score]]
 server.on("connection", (socket, request) => {
     // Create connecting client's profile (id and username)
     const client = socket;
@@ -200,10 +200,12 @@ function processChatMessage(message, client) {
     const currentDate = new Date();
     const diagnosis = (0, message_diagnosis_1.createMessageDiagnosis)(message);
     // If there is more than one message, calculate characters per second between most recently sent message and current message
-    let typingSpeed = 0;
+    let typingSpeed = { message: "", anx_score: 0, speed: 0 };
     if (messageHistory.length > 0) {
         typingSpeed = calculateTypingSpeed({ message: message, date: currentDate }, client.id); // Use this to generate a Hover message.
+        diagnosis.score.anxiety += typingSpeed.anx_score; // Add typing speed anxiety score to diagnosis anxiety
     }
+    console.log("Diagnosis Score", diagnosis.score);
     const chatMessageContent = {
         message: diagnosis.analysedMessage,
         keywords: diagnosis.keywords,
@@ -243,6 +245,10 @@ function generateRollingScore(clientId, history) {
             finalScore.depression = finalScore.depression + idScore.score.depression;
         }
     });
+    finalScore.anxiety = finalScore.anxiety / filteredIdScores.length;
+    finalScore.depression = finalScore.depression / filteredIdScores.length;
+    // console.log("Average anxiety score", finalScore.anxiety);
+    // console.log("Average depression score", finalScore.depression);
     return finalScore;
 }
 function generateChatTranscript(history) {
@@ -277,8 +283,13 @@ function calculateTypingSpeed(current, userId) {
     const currTypingSpeedMsg = { content: current.message, timestamp: current.date };
     const messageSpeedDetection = (0, DetectTypingSpeed_1.detectTypingSpeed)(prevTypingSpeedMsg, currTypingSpeedMsg);
     const user = users.find((user) => user.id === userId);
-    if (user)
-        user.typingSpeed = (0, DetectTypingSpeed_1.flagTypingSpeed)(user.typingSpeed, messageSpeedDetection).speed; // TODO: Test to make sure this actually detects the global user's typing speed
-    return messageSpeedDetection;
+    if (user) {
+        const flagged = (0, DetectTypingSpeed_1.flagTypingSpeed)(user.typingSpeed, messageSpeedDetection, messageHistory);
+        user.typingSpeed = flagged.speed; // TODO: Test to make sure this actually detects the global user's typing speed
+        return flagged;
+    }
+    else {
+        return { message: "", anx_score: 0, speed: 0 };
+    }
 }
 console.log(`Hover Server v1.0 is running on port ${port}`);

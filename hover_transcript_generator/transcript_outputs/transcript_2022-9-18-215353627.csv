@@ -1,0 +1,3 @@
+author, role, dateSent, message, hoverComment, anxietyScore, depressionScore, riskFlag
+rebeccachambers, patient, 2022-09-18T11:52:19.537Z, depression, Patient is displaying signs of depression., 0, 3, false
+rebeccachambers, patient, 2022-09-18T11:52:24.191Z, depression, Patient is displaying signs of depression. Patient's typing speed is ~2.17 characters per second. Patient seems to be exhibiting mild-low anxiety and mild-low depression. Consider using  <a target="_blank" href=/therapeuticModel/sfbt>SFBT</a>., 0, 3, false

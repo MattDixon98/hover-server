@@ -6,7 +6,7 @@
 
 export type Keyword = {
     word: string,
-    score: number,
+    score: {anxiety: number, depression: number, risk: boolean},
     derived: string,
     flag: string | null,
     position: Array<number> | null

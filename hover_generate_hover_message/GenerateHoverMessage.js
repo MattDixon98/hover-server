@@ -9,19 +9,19 @@ function generateHoverMessage(analysisData) {
         message += createRepetitionComment(analysisData.repetition);
     }
     // Check for anxiety, depression and risk scores
-    if (analysisData.newScore.anxiety || analysisData.newScore.depression || analysisData.newScore.risk) {
-        message += createScoreComment(analysisData.newScore);
-    }
+    // if(analysisData.newScore.anxiety || analysisData.newScore.depression || analysisData.newScore.risk){
+    //     message += createScoreComment(analysisData.newScore);
+    // }
     // Check for correctness of message
     if (analysisData.correctness < 100) {
         message += `Patient wrote message with ${analysisData.correctness}% correctness.\n`;
     }
     // Check for message speed
-    if (analysisData.typingSpeed > 0) {
-        message += `Patient's typing speed is ~${analysisData.typingSpeed} characters per second.\n`;
+    if (analysisData.typingSpeed.anx_score > 0) {
+        message += analysisData.typingSpeed.message + "\n";
     }
     // Check for facilitator suggestion
-    const facilitatorSuggestion = (0, FacilitatorSuggestion_1.generateFacilitatorSuggestion)(analysisData.rollingScore.anxiety, analysisData.rollingScore.depression, analysisData.newScore.anxiety, analysisData.newScore.depression);
+    const facilitatorSuggestion = (0, FacilitatorSuggestion_1.generateFacilitatorSuggestion)(analysisData.rollingScore.anxiety, analysisData.rollingScore.depression);
     if (facilitatorSuggestion.therapyType.trim().length > 0) {
         message += `${facilitatorSuggestion.text} <a target="_blank" href=${facilitatorSuggestion.link}>${facilitatorSuggestion.therapyType}</a>.\n`;
     }

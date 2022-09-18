@@ -1,0 +1,6 @@
+author, role, dateSent, message, hoverComment, anxietyScore, depressionScore, riskFlag
+rebeccachambers, patient, 2022-09-18T12:09:18.318Z, hi Jamie!, , 0, 0, false
+jamierossiter, facilitator, 2022-09-18T12:09:23.284Z, Hi rebecca, Patient's typing speed is ~2.03 characters per second., 0, 0, false
+rebeccachambers, patient, 2022-09-18T12:09:31.544Z, how the heck are you?, Patient's typing speed is ~2.56 characters per second., 0, 0, false
+rebeccachambers, patient, 2022-09-18T12:09:34.173Z, jsdhfs, Patient wrote message with 0% correctness. Patient's typing speed is ~4.859999999999999 characters per second., 0, 0, false
+rebeccachambers, patient, 2022-09-18T12:09:41.921Z, sdfdsf sdf sdf sdf sd, Patient wrote message with 20% correctness. Patient's typing speed is ~7.609999999999999 characters per second., 0, 0, false

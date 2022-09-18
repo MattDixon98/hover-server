@@ -2,15 +2,23 @@
 // DetectTypingSpeed.ts by Matt Dixon
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.detectTypingSpeed = exports.flagTypingSpeed = void 0;
-function flagTypingSpeed(currTypingSpeed, newTypingSpeed) {
+function flagTypingSpeed(currTypingSpeed, newTypingSpeed, messages) {
     let final = { message: "", anx_score: 0, speed: 0 };
     if (currTypingSpeed == 0) {
         final.speed = newTypingSpeed;
     }
     else {
-        // Calculate % difference in typing speed
-        var difference = 100 * ((newTypingSpeed - currTypingSpeed) /
-            ((newTypingSpeed + currTypingSpeed) / 2));
+        // Get amount of messages sent by the client
+        let messagesSent = 0;
+        messages.forEach(message => {
+            if (JSON.parse(JSON.parse(message).content).author.role == "patient") { // TODO: Check to make sure this is not null
+                messagesSent++;
+            }
+        });
+        // Get avg typing speed
+        const avgTypingSpeed = (currTypingSpeed / messagesSent);
+        // Calculate % increase/ decrease in typing speed
+        var difference = ((newTypingSpeed - avgTypingSpeed) / avgTypingSpeed) * 100;
         // Add to anxiety score based on typing speed difference
         if (Math.abs(difference) >= 10 && Math.abs(difference) <= 19) {
             final.anx_score = 1;
@@ -30,13 +38,13 @@ function flagTypingSpeed(currTypingSpeed, newTypingSpeed) {
         // Print message based on typing speed difference
         if (Math.abs(difference) >= 10) {
             if (difference > 0) {
-                final.message = "User is typing " + difference.toFixed(2) + "% faster than normal";
+                final.message = "Patient is typing " + difference.toFixed(2) + "% faster than normal. ";
             }
             else {
-                final.message = "User is typing " + Math.abs(difference).toFixed(2) + "% slower than normal";
+                final.message = "Patient is typing " + Math.abs(difference).toFixed(2) + "% slower than normal. ";
             }
         }
-        final.speed = (currTypingSpeed + newTypingSpeed) / 2;
+        final.speed = (currTypingSpeed + newTypingSpeed);
     }
     return final;
 }

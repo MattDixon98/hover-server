@@ -1,4 +1,0 @@
-depress: 3
-depression: 3
-sad: 2
-down: 1
