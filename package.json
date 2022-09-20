@@ -12,14 +12,14 @@
   "dependencies": {
     "@types/uuid": "^8.3.4",
     "@types/ws": "^8.5.3",
-    "uuid": "^8.3.2",
-    "ws": "^8.8.1",
     "pos": "^0.4.2",
     "sentiment": "^5.0.2",
     "simple-spellchecker": "^1.0.2",
     "spelling": "^2.0.2",
     "synonyms": "^1.0.1",
-    "typescript": "^4.7.4",
-    "wink-lemmatizer": "^3.0.2"
+    "typescript": "^4.8.3",
+    "uuid": "^8.3.2",
+    "wink-lemmatizer": "^3.0.2",
+    "ws": "^8.8.1"
   }
 }

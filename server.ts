@@ -26,7 +26,7 @@ import { TypingSpeedAnalysis } from "./types/TypingSpeedAnalysisType/TypingSpeed
 
 const MAX_CLIENTS: number = 2;
 const port: number = 9000;
-const server: WebSocketServer = new WebSocketServer({ port: port });
+const server: WebSocketServer = new WebSocketServer({ port: process.env.PORT as any || port });
 let users: Array<ClientProfile> = [];
 let messageHistory: Array<string> = []; // ChatMessageContent - content: stringified JSON [message: string, keywords: Array<string>, author: ClientProfile, date: Date, hover: HoverMessage[comment: string, score: Score]]
 
