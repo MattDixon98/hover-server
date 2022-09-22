@@ -1,0 +1,7 @@
+author, role, dateSent, message, hoverComment, anxietyScore, depressionScore, riskFlag
+jamierossiter, facilitator, 2022-09-22T01:40:49.294Z, Hi cameron!, , 0, 0, false
+cambanfield, patient, 2022-09-22T01:40:53.981Z, Hi Jamie  how are you?, , 0, 0, false
+jamierossiter, facilitator, 2022-09-22T01:41:13.147Z, Can't complain. How are you feeling mate?, , 0, 9, false
+cambanfield, patient, 2022-09-22T01:41:22.709Z, I'm feeling a little sad tbh, Patient wrote message with 83.33% correctness., 0, 2, false
+cambanfield, patient, 2022-09-22T01:41:25.702Z, How are you?, , 0, 0, false
+cambanfield, patient, 2022-09-22T01:41:43.188Z, You feeling a bit anxious yourself?, , 9, 1, false

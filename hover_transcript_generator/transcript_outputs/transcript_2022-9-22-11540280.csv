@@ -1,0 +1,5 @@
+author, role, dateSent, message, hoverComment, anxietyScore, depressionScore, riskFlag
+jamierossiter, facilitator, 2022-09-22T01:46:47.848Z, Hi cam!, , 0, 0, false
+cambanfield, patient, 2022-09-22T01:46:54.103Z, hey Jamie  how are you?, , 0, 0, false
+cambanfield, patient, 2022-09-22T01:47:11.931Z, I'm feeling quite depressed at the moment, , 0, 5, false
+cambanfield, patient, 2022-09-22T01:47:18.734Z, LIke super super sad, , 0, 1, false

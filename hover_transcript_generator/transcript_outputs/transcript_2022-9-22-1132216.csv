@@ -1,0 +1,22 @@
+author, role, dateSent, message, hoverComment, anxietyScore, depressionScore, riskFlag
+jamierossiter, facilitator, 2022-09-22T00:57:47.776Z, Hi mate, , 0, 0, false
+benjaminscott, patient, 2022-09-22T00:57:51.204Z, hi jamie, , 0, 0, false
+jamierossiter, facilitator, 2022-09-22T00:57:59.313Z, how are you going?, , 0, 0, false
+benjaminscott, patient, 2022-09-22T00:58:06.058Z, I'm pretty good thanks  how are you?, , 0, 0, false
+jamierossiter, facilitator, 2022-09-22T00:58:17.380Z, I'm going well today. Thanks. How can I help you today?, , 0, 0, false
+benjaminscott, patient, 2022-09-22T00:58:23.941Z, I'm feeling a little bit sad, , 0, 2, false
+jamierossiter, facilitator, 2022-09-22T00:58:34.528Z, Okay. Why don't you tell me what's wrong?, , 0, 3, false
+benjaminscott, patient, 2022-09-22T00:58:47.867Z, Look... I'm not entirely sure. It's hard to say, , 0, 2, false
+benjaminscott, patient, 2022-09-22T00:59:03.730Z, I think I might be depressed, , 0, 4, false
+benjaminscott, patient, 2022-09-22T00:59:13.819Z, I've really been struggling lately, , 0, 1, false
+jamierossiter, facilitator, 2022-09-22T00:59:34.614Z, Struggling how?, , 0, 1, false
+benjaminscott, patient, 2022-09-22T00:59:37.083Z, idk, , 0, 0, false
+benjaminscott, patient, 2022-09-22T00:59:46.939Z, I jsut havee ben i guess, Patient wrote message with 83.33% correctness., 1, 0, false
+benjaminscott, patient, 2022-09-22T01:01:54.174Z, Like I can't reallyg et up in the morning, Patient wrote message with 88.89% correctness., 0, 0, false
+jamierossiter, facilitator, 2022-09-22T01:02:24.337Z, im really nervous, , 4, 0, false
+benjaminscott, patient, 2022-09-22T01:02:28.568Z, im really nervous, , 4, 0, false
+benjaminscott, patient, 2022-09-22T01:02:38.340Z, dfgdfgdfgdfgdfgdfgd, Patient wrote message with 0% correctness., 0, 0, false
+benjaminscott, patient, 2022-09-22T01:02:43.337Z, kjasdhflaksdj gfadslkjfgh asdf, Patient wrote message with 0% correctness., 0, 0, false
+benjaminscott, patient, 2022-09-22T01:02:47.249Z, lzkdshf aldk, Patient wrote message with 0% correctness., 0, 0, false
+benjaminscott, patient, 2022-09-22T01:02:47.699Z, adf hjaksd f, Patient wrote message with 66.67% correctness., 0, 0, false
+benjaminscott, patient, 2022-09-22T01:02:47.905Z, asdjk f, Patient wrote message with 50% correctness., 0, 0, false

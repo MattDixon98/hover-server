@@ -1,0 +1,7 @@
+author, role, dateSent, message, hoverComment, anxietyScore, depressionScore, riskFlag
+jamierossiter, facilitator, 2022-09-22T01:08:36.157Z, Hi Cam!, , 0, 0, false
+cambanfield, patient, 2022-09-22T01:08:52.682Z, Hi Jamie! How are you mate?, , 0, 0, false
+jamierossiter, facilitator, 2022-09-22T01:09:11.733Z, Good mate. Yourself?, , 0, 0, false
+cambanfield, patient, 2022-09-22T01:09:20.246Z, Feeling super depressed at the moment tbh mate, Patient wrote message with 87.5% correctness., 0, 5, false
+cambanfield, patient, 2022-09-22T01:09:32.439Z, I dont know why, , 0, 0, false
+cambanfield, patient, 2022-09-22T01:09:44.104Z, Like im real sad, , 0, 1, false

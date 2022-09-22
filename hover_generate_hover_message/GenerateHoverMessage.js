@@ -25,7 +25,7 @@ function generateHoverMessage(analysisData) {
     if (facilitatorSuggestion.therapyType.trim().length > 0) {
         message += `${facilitatorSuggestion.text} <a target="_blank" href=${facilitatorSuggestion.link}>${facilitatorSuggestion.therapyType}</a>.\n`;
     }
-    return { comment: message.trim(), score: analysisData.newScore };
+    return { comment: message.trim(), score: analysisData.newScore, rollingScore: analysisData.rollingScore };
 }
 exports.generateHoverMessage = generateHoverMessage;
 function createRepetitionComment(repetition) {

@@ -3,5 +3,6 @@ import { Suggestion } from "../SuggestionType/SuggestionType";
 
 export type HoverMessage = {
     comment: string,
-    score: Score
+    score: Score,
+    rollingScore: Score
 }

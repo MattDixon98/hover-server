@@ -59,6 +59,7 @@ export function detectTypingSpeed(prevMessage: TypingSpeedMessage, currMessage: 
     // Calculate characters per millisecond
     let typingSpeedSec: number = currMessage.content.length/secondsBetweenTwoDate;
 
+    console.log("Current typing speed:", typingSpeedSec); // TODO: Check what the typing speed is
     return Math.round(typingSpeedSec * 100) / 100;
 
 }

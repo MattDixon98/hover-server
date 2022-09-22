@@ -28,7 +28,7 @@ export function generateHoverMessage(analysisData: AnalysisData): HoverMessage {
         message += `${facilitatorSuggestion.text} <a target="_blank" href=${facilitatorSuggestion.link}>${facilitatorSuggestion.therapyType}</a>.\n`
     }
 
-    return { comment: message.trim(), score: analysisData.newScore };
+    return { comment: message.trim(), score: analysisData.newScore, rollingScore: analysisData.rollingScore };
 }
 
 function createRepetitionComment(repetition: Repetition) : string {
