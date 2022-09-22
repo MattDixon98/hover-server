@@ -279,13 +279,10 @@ function processChatMessage(message: string, client: ClientProfile) : string {
 
     // If there is more than 5 messages sent by a user, calculate characters per second between most recently sent message and current message
     const userMessageHistory: Array<string> = messageHistory.filter((msg: string) => {
-        console.log("Raw message", msg);
-        console.log("Parsed message", JSON.parse(msg));
         if(JSON.parse(JSON.parse(msg).content)) return JSON.parse(JSON.parse(msg).content).author.id === client.id
         else return "" === client.id;
     });
     let typingSpeed: TypingSpeedAnalysis = { message: "", anx_score: 0, speed: 0 };
-    console.log(userMessageHistory);
     if(userMessageHistory.length > 5){
         typingSpeed = calculateTypingSpeed({message: message, date: currentDate}, client.id); // Use this to generate a Hover message.
         diagnosis.score.anxiety += typingSpeed.anx_score; // Add typing speed anxiety score to diagnosis anxiety

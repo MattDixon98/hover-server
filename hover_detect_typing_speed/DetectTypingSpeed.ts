@@ -22,7 +22,8 @@ export function flagTypingSpeed(currTypingSpeed: number, newTypingSpeed: number,
         const avgTypingSpeed = (currTypingSpeed/ messagesSent);
 
         // Calculate % increase/ decrease in typing speed
-        var difference = ( (newTypingSpeed - avgTypingSpeed) / avgTypingSpeed ) * 100;
+        // var difference = ( (newTypingSpeed - avgTypingSpeed) / avgTypingSpeed ) * 100;
+        var difference = ( (newTypingSpeed - avgTypingSpeed) / avgTypingSpeed );
 
         // Add to anxiety score based on typing speed difference
         if ( Math.abs(difference) >= 10 && Math.abs(difference) <= 19 ) {
