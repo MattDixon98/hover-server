@@ -18,7 +18,8 @@ function flagTypingSpeed(currTypingSpeed, newTypingSpeed, messages) {
         // Get avg typing speed
         const avgTypingSpeed = (currTypingSpeed / messagesSent);
         // Calculate % increase/ decrease in typing speed
-        var difference = ((newTypingSpeed - avgTypingSpeed) / avgTypingSpeed) * 100;
+        // var difference = ( (newTypingSpeed - avgTypingSpeed) / avgTypingSpeed ) * 100;
+        var difference = ((newTypingSpeed - avgTypingSpeed) / avgTypingSpeed);
         // Add to anxiety score based on typing speed difference
         if (Math.abs(difference) >= 10 && Math.abs(difference) <= 19) {
             final.anx_score = 1;
@@ -54,6 +55,7 @@ function detectTypingSpeed(prevMessage, currMessage) {
     let secondsBetweenTwoDate = Math.abs((new Date(currMessage.timestamp).getTime() - new Date(prevMessage.timestamp).getTime()) / 1000);
     // Calculate characters per millisecond
     let typingSpeedSec = currMessage.content.length / secondsBetweenTwoDate;
+    console.log("Current typing speed:", typingSpeedSec); // TODO: Check what the typing speed is
     return Math.round(typingSpeedSec * 100) / 100;
 }
 exports.detectTypingSpeed = detectTypingSpeed;

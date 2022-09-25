@@ -23,7 +23,9 @@ import { TypingSpeedMessage } from "./types/TypingSpeedMessageType/TypingSpeedMe
 import { generateHoverMessage } from "./hover_generate_hover_message/GenerateHoverMessage";
 import { Score } from "./types/ScoreType/ScoreType";
 import { TypingSpeedAnalysis } from "./types/TypingSpeedAnalysisType/TypingSpeedAnalysisType";
+import { HoverMessage } from "./types/HoverMessageType/HoverMessageType";
 
+const USER_DATA_URI: string = "localhost";
 const MAX_CLIENTS: number = 2;
 const port: number = 9000;
 const server: WebSocketServer = new WebSocketServer({ port: process.env.PORT as any || port });
@@ -46,6 +48,15 @@ server.on("connection", (socket: WebSocket, request: http.IncomingMessage) => {
     // Handle client disconnect
     client.on("close", (code: number, reason: Buffer) => {
 
+        // Save patient and facilitator data
+        const patientClientEmail: string | undefined = users.find((patient: ClientProfile) => patient.role === "patient")?.email;;
+        const facilitatorClientEmail: string | undefined = users.find((patient: ClientProfile) => patient.role === "facilitator")?.email;
+        const lastPatientMessageString: string | undefined = messageHistory.find((message: string) => JSON.parse(JSON.parse(message).content).author.role === "patient");
+        if(patientClientEmail && facilitatorClientEmail && lastPatientMessageString){
+            const patientMessageScore: Score = JSON.parse(JSON.parse(lastPatientMessageString).content).hover.score;
+            performSaveData({facilitatorEmail: facilitatorClientEmail, patientEmail: patientClientEmail, dprScore: patientMessageScore.depression.toString(), anxScore: patientMessageScore.anxiety.toString()});
+        }
+        
         let message: string = "";
 
         if(messageHistory.length > 0) generateChatTranscript(messageHistory); // Generate chat transcript if there are messages in message history
@@ -164,21 +175,22 @@ function broadcastMessage(server: WebSocketServer, message: string, excludeCurre
 
 function getClientProfile(reqUrl: string | undefined): ClientProfile {
 
-    let profile: ClientProfile = { id: "", user: null, role: null, typingSpeed: 0 };
+    let profile: ClientProfile = { id: "", user: undefined, role: undefined, email: undefined, typingSpeed: 0 };
 
     if(reqUrl){
         profile.id = uuidv4(); // Generate unique identifier
         profile.user = extractDataFromUrl(url.parse(reqUrl as string), "user"); // Extract user name from query params
         profile.role = extractDataFromUrl(url.parse(reqUrl as string), "role"); // Extract user name from query params
+        profile.email = extractDataFromUrl(url.parse(reqUrl as string), "email") // Extract user email from query params
     } 
 
     return profile;
 
 }
 
-function extractDataFromUrl(url: url.UrlWithStringQuery, extractToken: string) : string | null {
+function extractDataFromUrl(url: url.UrlWithStringQuery, extractToken: string) : string | undefined {
     
-    let query: string | null = null;
+    let query: string | undefined = undefined;
 
     if(url.query){
         if(url.query.includes(`${extractToken}=`)){
@@ -394,6 +406,26 @@ function calculateTypingSpeed(current: {message: string, date: Date}, userId: st
     } else {
         return { message: "", anx_score: 0, speed: 0 }
     }
+}
+
+function performSaveData(saveData: { facilitatorEmail: string, patientEmail: string, dprScore: string, anxScore: string }): void {
+
+    const req: http.ClientRequest = http.request({ 
+        host: USER_DATA_URI, 
+        port: 5050, 
+        method: "POST", 
+        headers: {
+        "Content-Type": "application/json"
+        }
+    })
+
+    req.on("error", (error: Error) => {
+        console.error("Save Data Error", error);
+    })
+
+    req.write(JSON.stringify(saveData));
+    req.end();
+    
 }
 
 console.log(`Hover Server v1.0 is running on port ${port}`);

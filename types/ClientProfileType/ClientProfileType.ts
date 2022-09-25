@@ -1,6 +1,7 @@
 export type ClientProfile = {
     id: string, 
-    user: string | null,
-    role: string | null,
+    user: string | undefined,
+    role: string | undefined,
+    email: string | undefined,
     typingSpeed: number
 }

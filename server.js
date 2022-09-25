@@ -8,6 +8,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const ws_1 = require("ws");
+const http_1 = __importDefault(require("http"));
 const url_1 = __importDefault(require("url"));
 const uuid_1 = require("uuid");
 const SocketClosureCodes_1 = require("./types/SocketClosureCodes/SocketClosureCodes");
@@ -15,6 +16,7 @@ const message_diagnosis_1 = require("./hover_message_diagnosis/message_diagnosis
 const transcript_generator_1 = require("./hover_transcript_generator/transcript_generator");
 const DetectTypingSpeed_1 = require("./hover_detect_typing_speed/DetectTypingSpeed");
 const GenerateHoverMessage_1 = require("./hover_generate_hover_message/GenerateHoverMessage");
+const USER_DATA_URI = "localhost";
 const MAX_CLIENTS = 2;
 const port = 9000;
 const server = new ws_1.WebSocketServer({ port: process.env.PORT || port });
@@ -33,10 +35,21 @@ server.on("connection", (socket, request) => {
     }
     // Handle client disconnect
     client.on("close", (code, reason) => {
+        var _a, _b;
+        // Save patient and facilitator data
+        const patientClientEmail = (_a = users.find((patient) => patient.role === "patient")) === null || _a === void 0 ? void 0 : _a.email;
+        ;
+        const facilitatorClientEmail = (_b = users.find((patient) => patient.role === "facilitator")) === null || _b === void 0 ? void 0 : _b.email;
+        const lastPatientMessageString = messageHistory.find((message) => JSON.parse(JSON.parse(message).content).author.role === "patient");
+        if (patientClientEmail && facilitatorClientEmail && lastPatientMessageString) {
+            const patientMessageScore = JSON.parse(JSON.parse(lastPatientMessageString).content).hover.score;
+            performSaveData({ facilitatorEmail: facilitatorClientEmail, patientEmail: patientClientEmail, dprScore: patientMessageScore.depression.toString(), anxScore: patientMessageScore.anxiety.toString() });
+        }
         let message = "";
         if (messageHistory.length > 0)
             generateChatTranscript(messageHistory); // Generate chat transcript if there are messages in message history
         messageHistory = []; // Clear message history between clients
+        // Send scores to user data server
         if (code !== SocketClosureCodes_1.SocketClosureCodes.INVALID_REQUEST) {
             message = `${client.profile.user} has left the chat.`;
             broadcastMessage(server, processServerMessage(message), false, client); // Broadcast message to all clients
@@ -112,16 +125,17 @@ function broadcastMessage(server, message, excludeCurrentClient, currentClient) 
     });
 }
 function getClientProfile(reqUrl) {
-    let profile = { id: "", user: null, role: null, typingSpeed: 0 };
+    let profile = { id: "", user: undefined, role: undefined, email: undefined, typingSpeed: 0 };
     if (reqUrl) {
         profile.id = (0, uuid_1.v4)(); // Generate unique identifier
         profile.user = extractDataFromUrl(url_1.default.parse(reqUrl), "user"); // Extract user name from query params
         profile.role = extractDataFromUrl(url_1.default.parse(reqUrl), "role"); // Extract user name from query params
+        profile.email = extractDataFromUrl(url_1.default.parse(reqUrl), "email"); // Extract user email from query params
     }
     return profile;
 }
 function extractDataFromUrl(url, extractToken) {
-    let query = null;
+    let query = undefined;
     if (url.query) {
         if (url.query.includes(`${extractToken}=`)) {
             query = url.query.split(`${extractToken}=`)[1].split("&")[0]; // Split the query param by the extract token, then split it by an ampersand (&), which indicates next query param
@@ -201,15 +215,12 @@ function processChatMessage(message, client) {
     const diagnosis = (0, message_diagnosis_1.createMessageDiagnosis)(message);
     // If there is more than 5 messages sent by a user, calculate characters per second between most recently sent message and current message
     const userMessageHistory = messageHistory.filter((msg) => {
-        console.log("Raw message", msg);
-        console.log("Parsed message", JSON.parse(msg));
         if (JSON.parse(JSON.parse(msg).content))
             return JSON.parse(JSON.parse(msg).content).author.id === client.id;
         else
             return "" === client.id;
     });
     let typingSpeed = { message: "", anx_score: 0, speed: 0 };
-    console.log(userMessageHistory);
     if (userMessageHistory.length > 5) {
         typingSpeed = calculateTypingSpeed({ message: message, date: currentDate }, client.id); // Use this to generate a Hover message.
         diagnosis.score.anxiety += typingSpeed.anx_score; // Add typing speed anxiety score to diagnosis anxiety
@@ -299,5 +310,20 @@ function calculateTypingSpeed(current, userId) {
     else {
         return { message: "", anx_score: 0, speed: 0 };
     }
+}
+function performSaveData(saveData) {
+    const req = http_1.default.request({
+        host: USER_DATA_URI,
+        port: 5050,
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+    req.on("error", (error) => {
+        console.error("Save Data Error", error);
+    });
+    req.write(JSON.stringify(saveData));
+    req.end();
 }
 console.log(`Hover Server v1.0 is running on port ${port}`);
