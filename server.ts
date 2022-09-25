@@ -50,6 +50,8 @@ server.on("connection", (socket: WebSocket, request: http.IncomingMessage) => {
 
         if(messageHistory.length > 0) generateChatTranscript(messageHistory); // Generate chat transcript if there are messages in message history
         messageHistory = []; // Clear message history between clients
+
+        // Send scores to user data server
         
         if(code !== SocketClosureCodes.INVALID_REQUEST){
 
