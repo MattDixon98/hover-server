@@ -25,7 +25,8 @@ import { Score } from "./types/ScoreType/ScoreType";
 import { TypingSpeedAnalysis } from "./types/TypingSpeedAnalysisType/TypingSpeedAnalysisType";
 import { HoverMessage } from "./types/HoverMessageType/HoverMessageType";
 
-const USER_DATA_URI: string = "localhost";
+// const USER_DATA_URI: string = "localhost";
+const USER_DATA_URI: string = "https://server-hover-userdata.herokuapp.com/"
 const MAX_CLIENTS: number = 2;
 const port: number = 9000;
 const server: WebSocketServer = new WebSocketServer({ port: process.env.PORT as any || port });
