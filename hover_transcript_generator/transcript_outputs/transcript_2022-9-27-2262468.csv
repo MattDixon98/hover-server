@@ -1,0 +1,4 @@
+author, role, dateSent, message, hoverComment, anxietyScore, depressionScore, riskFlag
+Alan Choy, facilitator, 2022-09-27T12:05:58.382Z, Hi Cam  how are you?, , 0, 0, false
+Cam Banfield, patient, 2022-09-27T12:06:07.555Z, Hi Alan. I am very fucking sad. Like very sad. , , 8, 2, false
+Cam Banfield, patient, 2022-09-27T12:06:15.398Z, I want to kill myself  most defeinitely, Patient wrote message with 85.71% correctness. Patient seems to be exhibiting mild-low anxiety and mild-low depression. Consider using  <a target="_blank" href=/therapeuticModel/sfbt>SFBT</a>., 4, 2, false

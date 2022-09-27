@@ -1,0 +1,4 @@
+author, role, dateSent, message, hoverComment, anxietyScore, depressionScore, riskFlag
+Ying Chen, facilitator, 2022-09-27T12:00:20.679Z, Hi Cam  how are you?, , 0, 0, false
+Cam Banfield, patient, 2022-09-27T12:00:29.045Z, I'm very very sad. How about you?, , 0, 2, false
+Cam Banfield, patient, 2022-09-27T12:00:41.440Z, I cannot believe what has happened. I cannot believe it!, Patient repeated the term "I cannot believe" 2 times., 0, 0, false

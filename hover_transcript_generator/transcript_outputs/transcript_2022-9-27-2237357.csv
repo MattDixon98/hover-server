@@ -1,0 +1,4 @@
+author, role, dateSent, message, hoverComment, anxietyScore, depressionScore, riskFlag
+Ying Chen, facilitator, 2022-09-27T12:02:23.250Z, Hi Cam  how are you today?, , 0, 0, false
+Cam Banfield, patient, 2022-09-27T12:02:36.401Z, I'm feeling rather average. I am so sad... like so fucking sad., , 3, 3, false
+Cam Banfield, patient, 2022-09-27T12:02:45.884Z, I'm also extremely angry and i'm going to kill someone, Patient seems to be exhibiting mild-low anxiety and mild-low depression. Consider using  <a target="_blank" href=/therapeuticModel/sfbt>SFBT</a>., 9, 2, false

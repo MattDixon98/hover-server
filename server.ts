@@ -30,9 +30,17 @@ const MAX_CLIENTS: number = 2;
 const port: number = 9000;
 const server: WebSocketServer = new WebSocketServer({ port: process.env.PORT as any || port });
 let users: Array<ClientProfile> = [];
-let messageHistory: Array<string> = []; // ChatMessageContent - content: stringified JSON [message: string, keywords: Array<string>, author: ClientProfile, date: Date, hover: HoverMessage[comment: string, score: Score]]
+let messageHistory: Array<string> = []; // ChatMessageContent - content: stringified JSON [message: string, keywords: Array<string>, author: ClientProfile, date: Date, hover: HoverMessage[comment: string, score: Score, rollingScore: Score]]
 
 server.on("connection", (socket: WebSocket, request: http.IncomingMessage) => {
+
+    // Ping socket every 50 seconds to prevent Heroku closing the socket after 55 seconds of inactivity
+    setInterval(() => {
+        if(socket){
+            socket.ping();
+            console.log(`Socket ${client.profile.id} pinged the server.`);
+        }
+    }, 50000)
 
     // Create connecting client's profile (id and username)
     const client: any = socket;
@@ -51,10 +59,12 @@ server.on("connection", (socket: WebSocket, request: http.IncomingMessage) => {
         // Save patient and facilitator data
         const patientClientEmail: string | undefined = users.find((patient: ClientProfile) => patient.role === "patient")?.email;;
         const facilitatorClientEmail: string | undefined = users.find((patient: ClientProfile) => patient.role === "facilitator")?.email;
-        const lastPatientMessageString: string | undefined = messageHistory.find((message: string) => JSON.parse(JSON.parse(message).content).author.role === "patient");
+        const patientMessageList: Array<string> = messageHistory.filter((message: string) => JSON.parse(JSON.parse(message).content).author.role === "patient");
+        const lastPatientMessageString: string = patientMessageList[patientMessageList.length-1];
+        // console.log(lastPatientMessageString);
         if(patientClientEmail && facilitatorClientEmail && lastPatientMessageString){
-            const patientMessageScore: Score = JSON.parse(JSON.parse(lastPatientMessageString).content).hover.score;
-            performSaveData({facilitatorEmail: facilitatorClientEmail, patientEmail: patientClientEmail, dprScore: patientMessageScore.depression.toString(), anxScore: patientMessageScore.anxiety.toString()});
+            const patientMessageScore: Score = JSON.parse(JSON.parse(lastPatientMessageString).content).hover.rollingScore;
+            if(patientMessageScore.depression || patientMessageScore.anxiety || patientMessageScore.risk) performSaveData({facilitatorEmail: facilitatorClientEmail, patientEmail: patientClientEmail, dprScore: patientMessageScore.depression.toString(), anxScore: patientMessageScore.anxiety.toString()});
         }
         
         let message: string = "";
@@ -195,6 +205,7 @@ function extractDataFromUrl(url: url.UrlWithStringQuery, extractToken: string) :
     if(url.query){
         if(url.query.includes(`${extractToken}=`)){
             query = url.query.split(`${extractToken}=`)[1].split("&")[0]; // Split the query param by the extract token, then split it by an ampersand (&), which indicates next query param
+            if(query.includes("%20")) query = query.replace(/%20/g, " ");
         }
     }
 
@@ -212,7 +223,7 @@ function validateUserProfile(profile: ClientProfile, server: WebSocketServer): P
 
         // Check username character length
         const maxCharacters: number = 20; // TODO: Update this based on frontend requirements
-        const minCharacters: number = 5;
+        const minCharacters: number = 1;
         if(profile.user.length > maxCharacters){
             valid = false;
             reason += "\u2022 Username contains too many characters\n";
@@ -243,11 +254,11 @@ function validateUserProfile(profile: ClientProfile, server: WebSocketServer): P
 
         })
 
-        // Check to see if username contains spaces
-        if(profile.user.split(" ").length > 1){
-            valid = false;
-            reason += "\u2022 Username cannot contain whitespaces\n"
-        }
+        // Check to see if username contains spaces - DEPRECATED. User names can now contain white spaces.
+        // if(profile.user.split(" ").length > 1){
+        //     valid = false;
+        //     reason += "\u2022 Username cannot contain whitespaces\n"
+        // }
 
     } else {
         valid = false;

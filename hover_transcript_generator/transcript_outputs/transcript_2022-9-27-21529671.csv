@@ -1,0 +1,4 @@
+author, role, dateSent, message, hoverComment, anxietyScore, depressionScore, riskFlag
+Cam Banfield, patient, 2022-09-27T11:48:57.150Z, Hi Jamie!, , 0, 0, false
+Jamie Rossiter, facilitator, 2022-09-27T11:49:03.594Z, Hi Cam  how are you?, , 0, 0, false
+Cam Banfield, patient, 2022-09-27T11:49:13.919Z, I'm feeling quite sad to be honest Jamie!, , 0, 2, false
